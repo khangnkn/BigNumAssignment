@@ -4,6 +4,8 @@
 #include <bitset>
 using namespace std;
 
+typedef bitset<128> binary;
+
 class QInt
 {
 private:
@@ -13,11 +15,6 @@ public:
 	QInt(int mode, string str);
 	~QInt();
 };
-
-int tru(int a, int b)
-{
-	return a - b;
-}
 
 int main()
 {
