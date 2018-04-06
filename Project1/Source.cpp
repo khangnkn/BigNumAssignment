@@ -27,8 +27,14 @@ int main()
 	qi.printBin();
 	return 0;
 }
+<<<<<<< HEAD
 
 QInt::QInt()
+=======
+//add sth
+// hello world
+int main()
+>>>>>>> 41e65b555e0af3234637706c67d84134565ed056
 {
 }
 
