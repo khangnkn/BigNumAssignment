@@ -12,3 +12,7 @@ public:
 	QInt();
 	~QInt();
 };
+int main()
+{
+	return 0;
+}
