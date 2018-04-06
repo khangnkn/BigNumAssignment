@@ -25,17 +25,8 @@ int main()
 	string a = "0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 	QInt qi(16, a);
 	qi.printBin();
+	system("pause");
 	return 0;
-}
-<<<<<<< HEAD
-
-QInt::QInt()
-=======
-//add sth
-// hello world
-int main()
->>>>>>> 41e65b555e0af3234637706c67d84134565ed056
-{
 }
 
 QInt::QInt(int mode, string str)
