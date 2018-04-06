@@ -10,6 +10,7 @@ private:
 	bitset<128> bit;
 public:
 	QInt();
+	QInt(int mode, string str);
 	~QInt();
 };
 
@@ -17,7 +18,8 @@ int tru(int a, int b)
 {
 	return a - b;
 }
-
+//add sth
+// hello world
 int main()
 {
 	return 0;
