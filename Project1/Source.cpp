@@ -9,10 +9,12 @@ typedef bitset<128> binary;
 class QInt
 {
 private:
-	bitset<128> bit;
+	binary bit;
 public:
 	QInt();
 	QInt(int mode, string str);
+	QInt operator=(QInt const &Qi);
+	
 	~QInt();
 //private:
 	static string strBigDecToBin(string str);
@@ -24,25 +26,38 @@ int main()
 {
 	string a = "0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 	QInt qi(16, a);
-	qi.printBin();
+	QInt p;
+	QInt q = p = qi;
+	q.printBin();
+	p.printBin();
 	system("pause");
 	return 0;
+}
+
+QInt::QInt()
+{
 }
 
 QInt::QInt(int mode, string str)
 {
 	if (mode == 2)
-		bit = bitset<128>(str);
+		bit = binary(str);
 	if (mode == 10)
 	{
 		string bstr = strBigDecToBin(str);
-		bit = bitset<128>(bstr);
-	}
+		bit = binary(bstr);
+	}	
 	if (mode == 16)
 	{
 		string hstr = strBigHexToBin(str);
-		bit = bitset<128>(hstr);
+		bit = binary(hstr);
 	}
+}
+
+QInt QInt::operator=(QInt const & Qi)
+{
+	this->bit = Qi.bit;
+	return Qi;
 }
 
 QInt::~QInt()
