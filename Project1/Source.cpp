@@ -25,7 +25,6 @@ int main()
 	string a = "0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 	QInt qi(16, a);
 	qi.printBin();
-	system("pause");
 	return 0;
 }
 

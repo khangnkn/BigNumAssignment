@@ -1,4 +1,4 @@
 ﻿  Source.cpp
-d:\projects\bignumassignment\project1\source.cpp(60): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-d:\projects\bignumassignment\project1\source.cpp(138): warning C4715: 'conHexBin': not all control paths return a value
+d:\projects\bignumassignment\project1\source.cpp(59): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+d:\projects\bignumassignment\project1\source.cpp(137): warning C4715: 'conHexBin': not all control paths return a value
   Project1.vcxproj -> D:\Projects\BigNumAssignment\x64\Debug\Project1.exe
