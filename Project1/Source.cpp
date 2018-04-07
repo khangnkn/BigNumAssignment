@@ -14,7 +14,7 @@ public:
 	QInt();
 	QInt(int mode, string str);
 	QInt operator=(QInt const &Qi);
-	
+	QInt operator+(QInt Qi);
 	~QInt();
 //private:
 	static string strBigDecToBin(string str);
@@ -24,12 +24,8 @@ public:
 
 int main()
 {
-	string a = "0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-	QInt qi(16, a);
-	QInt p;
-	QInt q = p = qi;
-	q.printBin();
-	p.printBin();
+	bool a = 1, b = 1;
+	cout << (bool)(a + b);
 	system("pause");
 	return 0;
 }
@@ -57,6 +53,16 @@ QInt::QInt(int mode, string str)
 QInt QInt::operator=(QInt const & Qi)
 {
 	this->bit = Qi.bit;
+	return Qi;
+}
+
+QInt QInt::operator+(QInt Qi)
+{
+	binary result;
+	for (int i = 0; i < 127; i++)
+	{
+		//result.set(127 - i, )
+	}
 	return Qi;
 }
 
