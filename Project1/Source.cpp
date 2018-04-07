@@ -24,8 +24,6 @@ public:
 
 int main()
 {
-	bool a = 1, b = 1;
-	cout << (bool)(a + b);
 	system("pause");
 	return 0;
 }
@@ -104,11 +102,17 @@ string DivByTwo(string str)
 
 string QInt::strBigDecToBin(string str)
 {
+	// ASK: nếu str < 0 thì sao?
 	string bin = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 	for (int i = 0; i < 128 && str != "0"; i++)
 	{
 		bin[127 - i] = carry(str) + 48;
 		str = DivByTwo(str);
+	}
+	//loại các phần tử khác 0 đầu
+	while (bin[0] == '0' && bin.length() != 1)
+	{
+		bin = bin.substr(1);
 	}
 	return string(bin);
 }
@@ -165,5 +169,6 @@ string QInt::strBigHexToBin(string str)
 
 void QInt::printBin()
 {
-	cout << bit << endl;
+	// ASK: theo yêu cầu của thầy là không in những số 0 đầu?
+	 cout << bit << endl;
 }
