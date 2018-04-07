@@ -24,6 +24,12 @@ public:
 
 int main()
 {
+<<<<<<< HEAD
+=======
+	string a = "12345";
+	QInt qi(10, a);
+	qi.printBin();
+>>>>>>> b0de3861919b596f821e84cd8ef8be866d138660
 	system("pause");
 	return 0;
 }
