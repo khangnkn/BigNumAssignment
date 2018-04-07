@@ -1,8 +1,11 @@
 ﻿#include <iostream>
 #include <cmath>
 #include <string>
+#include <sstream>
 #include <bitset>
 using namespace std;
+
+
 
 typedef bitset<128> binary;
 
@@ -14,17 +17,23 @@ public:
 	QInt();
 	QInt(int mode, string str);
 	~QInt();
+	void convertToDec();
 //private:
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
 	void printBin();
+		
 };
+
+void PlusOne(string & result);
+void MultByTwo(string & result);
 
 int main()
 {
-	string a = "12345";
-	QInt qi(10, a);
-	qi.printBin();
+	string a = "1010100111011001110010100101010100001010111110001011100101000101";
+	QInt num(2, a);
+	num.convertToDec();
+
 	system("pause");
 	return 0;
 }
@@ -51,6 +60,43 @@ QInt::QInt(int mode, string str)
 
 QInt::~QInt()
 {
+}
+
+void QInt::convertToDec()
+{
+	string str_bit = bit.to_string();
+
+	bitset<40> ZERO;
+
+	string result = ZERO.to_string();
+
+	// đánh dấu bit 1 đầu tiên
+	int i = 0;
+	while (i < str_bit.length() && str_bit[i] == 48)
+	{
+		i++;
+	}
+	
+	// duyệt chuỗi nhị phân từ trái sang phải
+	char add = str_bit[i] - '0';
+
+	while (i < 128)
+	{
+		MultByTwo(result);		// nhân 2
+		if(add==1)
+			PlusOne(result);	// cộng bit tiếp theo
+
+		i++;
+		add = str_bit[i] - '0';
+	}
+
+	// loại bỏ các phần tử 0 đầu
+	while (result[0] == '0' && result.length() != 1)
+	{
+		result = result.substr(1);
+	}
+
+	cout << result;
 }
 
 //Private functions.
@@ -151,9 +197,35 @@ string QInt::strBigHexToBin(string str)
 	}
 	return string(result);
 }
-
 void QInt::printBin()
 {
 	// ASK: theo yêu cầu của thầy là không in những số 0 đầu?
 	 cout << bit << endl;
+}
+
+void MultByTwo(string & result)
+{
+	string copy = result;
+	int i = result.length() - 1;
+	int carry = 0;
+	while (i >= 0)
+	{
+		copy[i] = ((result[i] - '0') * 2  + carry) % 10 + '0';
+		carry = (((result[i] - '0') * 2) > 9) ? 1 : 0;
+		i--;
+	}
+
+	result = copy;
+}
+void PlusOne(string & result)
+{
+	int i = result.length() - 1;
+	int carry = 1;
+
+	while (carry!=0)
+	{
+		int temp = result[i] - '0' + carry;
+		result[i] = (result[i] - '0' + carry) % 10 + '0';
+		carry = temp / 10;
+	}
 }
