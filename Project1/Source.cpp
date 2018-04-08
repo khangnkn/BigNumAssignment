@@ -10,6 +10,8 @@ class QInt
 {
 private:
 	binary bit;
+	string tempBit;
+
 public:
 	QInt();
 	QInt(int mode, string str);
@@ -24,7 +26,7 @@ public:
 
 int main()
 {
-	string a = "12345";
+	string a = "15";
 	QInt qi(10, a);
 	qi.printBin();
 	system("pause");
@@ -39,11 +41,13 @@ QInt::QInt(int mode, string str)
 {
 	if (mode == 2)
 		bit = binary(str);
+
 	if (mode == 10)
 	{
-		string bstr = strBigDecToBin(str);
-		bit = binary(bstr);
+		tempBit = strBigDecToBin(str);
+		bit = binary(tempBit);
 	}	
+
 	if (mode == 16)
 	{
 		string hstr = strBigHexToBin(str);
@@ -78,6 +82,7 @@ bool carry(string str)
 	int n = str.length();
 	return (str[n - 1] - 48) % 2;
 }
+
 string DivByTwo(string str)
 {
 	string result = str;
@@ -96,10 +101,10 @@ string DivByTwo(string str)
 	}
 
 	//loại các phần tử khác 0 đầu
-	while (result[0] == '0' && result.length() != 1)
+	/*while (result[0] == '0' && result.length() != 1)
 	{
 		result = result.substr(1);
-	}
+	}*/
 	return result;
 }
 
@@ -113,12 +118,18 @@ string QInt::strBigDecToBin(string str)
 		str = DivByTwo(str);
 	}
 	//loại các phần tử khác 0 đầu
-	while (bin[0] == '0' && bin.length() != 1)
+	int temp = 0;
+	for (int i = 0; i < 127; i++)
 	{
-		bin = bin.substr(1);
+		if (bin[i] == '1')
+		{
+			bin = bin.substr(i);
+			break;
+		}
 	}
-	return string(bin);
+	return bin;
 }
+
 string conHexBin(char c)
 {
 	int swh = c - 48;
@@ -160,6 +171,7 @@ string conHexBin(char c)
 		break;
 	}
 }
+
 string QInt::strBigHexToBin(string str)
 {
 	string result = "";
@@ -173,5 +185,7 @@ string QInt::strBigHexToBin(string str)
 void QInt::printBin()
 {
 	// ASK: theo yêu cầu của thầy là không in những số 0 đầu?
-	 cout << bit << endl;
+	 cout << tempBit << endl;
 }
+
+
