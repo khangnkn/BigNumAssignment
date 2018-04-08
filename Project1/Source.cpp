@@ -4,6 +4,7 @@
 #include <bitset>
 using namespace std;
 
+#define MAXBITS 127
 typedef bitset<128> binary;
 
 class QInt
@@ -11,24 +12,35 @@ class QInt
 private:
 	binary bit;
 	string tempBit;
-
+	
 public:
 	QInt();
 	QInt(int mode, string str);
 	QInt operator=(QInt const &Qi);
 	QInt operator+(QInt Qi);
+	binary getBits();
 	~QInt();
 //private:
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
 	void printBin();
+	string addBits(binary first, binary second);
+	string clearBitZeroes(string bin);
 };
 
 int main()
 {
 	string a = "15";
-	QInt qi(10, a);
-	qi.printBin();
+	string b = "9";
+	QInt q1(10, a);
+	QInt q2(10, b);
+	QInt q3(10, "2");
+	
+	q1.printBin();
+	q2.printBin();
+	cout << "\nResult: " << q3.addBits(q1.getBits(), q2.getBits());
+
+	cout << "\n";
 	system("pause");
 	return 0;
 }
@@ -39,13 +51,16 @@ QInt::QInt()
 
 QInt::QInt(int mode, string str)
 {
+	string currentBit;
+
 	if (mode == 2)
 		bit = binary(str);
 
 	if (mode == 10)
-	{
-		tempBit = strBigDecToBin(str);
-		bit = binary(tempBit);
+	{	
+		currentBit = strBigDecToBin(str);
+		bit = binary(currentBit);
+		tempBit = clearBitZeroes(currentBit);
 	}	
 
 	if (mode == 16)
@@ -69,6 +84,11 @@ QInt QInt::operator+(QInt Qi)
 		//result.set(127 - i, )
 	}
 	return Qi;
+}
+
+binary QInt::getBits()
+{
+	return this->bit;
 }
 
 QInt::~QInt()
@@ -116,16 +136,6 @@ string QInt::strBigDecToBin(string str)
 	{
 		bin[127 - i] = carry(str) + 48;
 		str = DivByTwo(str);
-	}
-	//loại các phần tử khác 0 đầu
-	int temp = 0;
-	for (int i = 0; i < 127; i++)
-	{
-		if (bin[i] == '1')
-		{
-			bin = bin.substr(i);
-			break;
-		}
 	}
 	return bin;
 }
@@ -188,4 +198,49 @@ void QInt::printBin()
 	 cout << tempBit << endl;
 }
 
+string QInt::addBits(binary first, binary second)
+{
+	string str1 = first.to_string();
+	string str2 = second.to_string();
+	string result;
+	int carry = 0; //Initialize carry
+
+	for (int i = MAXBITS; i >= 0; i--)
+	{
+		int firstBit = str1.at(i) - '0';
+		int secondBit = str2.at(i) - '0';
+		// boolean expression for sum of 3 bits
+		int sum = (firstBit ^ secondBit ^ carry) + '0';
+
+		result = char(sum) + result;
+
+		// boolean expression for 3-bit addition
+		carry = (firstBit & secondBit) | (secondBit & carry) | (firstBit & carry);
+	}
+	if (carry)
+	{
+		result = '1' + result;
+	}
+
+	result = clearBitZeroes(result);
+
+	return result;
+}
+
+string QInt::clearBitZeroes(string bin)
+{
+	string tempBin = bin;
+	int temp = 0;
+
+	for (int i = 0; i < MAXBITS; i++)
+	{
+		if (tempBin[i] == '1')
+		{
+			tempBin = tempBin.substr(i);
+			break;
+		}
+	}
+
+	return tempBin;
+}
 
