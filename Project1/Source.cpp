@@ -17,7 +17,7 @@ public:
 	QInt();
 	QInt(int mode, string str);
 	QInt operator=(QInt const &Qi);
-	QInt operator+(QInt Qi);
+	friend QInt operator+(QInt Qi_1, QInt Qi_2);
 	~QInt();
 	void convertToDec();
 //private:
@@ -32,9 +32,13 @@ void MultByTwo(string & result);
 
 int main()
 {
-	string a = "1010100111011001110010100101010100001010111110001011100101000101";
-	QInt num(2, a);
-	num.convertToDec();
+	string a = "1526";
+	string b = "0x123";
+	QInt m(10, a);
+	QInt n(16, b);
+	cout
+	cout << a;
+	cout << b;
 
 	system("pause");
 	return 0;
@@ -66,15 +70,7 @@ QInt QInt::operator=(QInt const & Qi)
 	return Qi;
 }
 
-QInt QInt::operator+(QInt Qi)
-{
-	binary result;
-	for (int i = 0; i < 127; i++)
-	{
-		//result.set(127 - i, )
-	}
-	return Qi;
-}
+
 
 QInt::~QInt()
 {
@@ -234,6 +230,19 @@ void MultByTwo(string & result)
 	}
 
 	result = copy;
+}
+
+QInt operator+(QInt Qi_1, QInt Qi_2)
+{
+	QInt qResult;
+	while (Qi_2.bit.to_ullong() != 0)
+	{
+		binary carry = Qi_1.bit & Qi_2.bit;
+		Qi_1.bit = Qi_1.bit ^ Qi_2.bit;
+		Qi_2.bit = carry << 1;
+	}
+
+	return QInt(Qi_1);
 }
 void PlusOne(string & result)
 {
