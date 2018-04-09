@@ -12,15 +12,20 @@ typedef bitset<128> binary;
 class QInt
 {
 private:
-	binary bit;
+	bitset<128> bit;
 public:
 	QInt();
 	QInt(int mode, string str);
-	QInt operator=(QInt const &Qi);
-	friend QInt operator+(QInt Qi_1, QInt Qi_2);
 	~QInt();
 	string convertToDec();
 	string convertToHex();
+
+	QInt & operator=(const QInt & index);
+	friend QInt operator+(const QInt & a, const QInt & b);
+	friend QInt operator-(const QInt & a, const QInt & b);
+	friend QInt operator*(const QInt & a, const QInt & b);
+	friend QInt operator/(const QInt & a, const QInt & b);
+
 	//private:
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
@@ -33,40 +38,39 @@ void MultByTwo(string & result);
 
 int main()
 {
-	string str_bits = "1001000001011000110010000111000000100110010011011101000001011101111110010011010101000101011001010";
-	QInt num(2, str_bits);
-	cout << num.convertToDec();
+	string str_bits = "101111";
+	QInt index(2, str_bits);
+	
+	index.printBin();
+	
 	system("pause");
 	return 0;
 }
 
 QInt::QInt()
 {
+	int i = 0;
+	while (i < 128)
+	{
+		bit[i] = 0;
+	}
 }
 
 QInt::QInt(int mode, string str)
 {
 	if (mode == 2)
-		bit = binary(str);
+		bit = bitset<128>(str);
 	if (mode == 10)
 	{
 		string bstr = strBigDecToBin(str);
-		bit = binary(bstr);
-	}	
+		bit = bitset<128>(bstr);
+	}
 	if (mode == 16)
 	{
 		string hstr = strBigHexToBin(str);
-		bit = binary(hstr);
+		bit = bitset<128>(hstr);
 	}
 }
-
-QInt QInt::operator=(QInt const & Qi)
-{
-	this->bit = Qi.bit;
-	return Qi;
-}
-
-
 
 QInt::~QInt()
 {
@@ -74,8 +78,7 @@ QInt::~QInt()
 
 string QInt::convertToDec()
 {
-	string str_bit = bit.to_string();
-
+	
 	string result = "0000000000000000000000000000000000000000\0";	// result hiển thị giá trị thập phân (16 byte ~ 40 kí tự) 
 
 	// đánh dấu bit 1 đầu tiên
@@ -160,6 +163,19 @@ string QInt::convertToHex()
 	return result;
 }
 
+QInt & QInt::operator=(const QInt & index)
+{
+	int i = 0;
+	
+	while (i < 128)
+	{
+		this->bit[i] = index.bit[i];
+		i++;
+	}
+
+	return *this;
+}
+
 //Private functions.
 //These functions support calculating process.
 bool carry(string str)
@@ -183,6 +199,7 @@ string DivByTwo(string str)
 		result[i] = ((str[i] - '0') / 2 + add + '0');
 
 	}
+
 
 	//loại các phần tử khác 0 đầu
 	while (result[0] == '0' && result.length() != 1)
@@ -278,18 +295,23 @@ void MultByTwo(string & result)
 
 	result = copy;
 }
-
-QInt operator+(QInt Qi_1, QInt Qi_2)
+QInt operator+(const QInt & a, const QInt & b)
 {
-	QInt qResult;
-	while (Qi_2.bit.to_ullong() != 0)
+	QInt result;
+
+	bool carry = 0;
+
+	string a_copy = a.bit.to_string();
+	string b_copy = b.bit.to_string();
+
+	int i = a_copy.length() - 1;
+
+	while (i >= 0)
 	{
-		binary carry = Qi_1.bit & Qi_2.bit;
-		Qi_1.bit = Qi_1.bit ^ Qi_2.bit;
-		Qi_2.bit = carry << 1;
+
 	}
 
-	return QInt(Qi_1);
+	return QInt(result);
 }
 void PlusOne(string & result)
 {
