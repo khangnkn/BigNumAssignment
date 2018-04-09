@@ -33,19 +33,9 @@ void MultByTwo(string & result);
 
 int main()
 {
-<<<<<<< HEAD
-	string a = "1526";
-	string b = "0x123";
-	QInt m(10, a);
-	QInt n(16, b);
-	cout << a;
-	cout << b;
-
-=======
 	string str_bits = "1001000001011000110010000111000000100110010011011101000001011101111110010011010101000101011001010";
 	QInt num(2, str_bits);
 	cout << num.convertToDec();
->>>>>>> 79629551a734fae6f90c556a1ecd7e551d7aa723
 	system("pause");
 	return 0;
 }
