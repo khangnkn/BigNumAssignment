@@ -1,7 +1,6 @@
 ﻿  Source.cpp
-d:\projects\bignumassignment\project1\source.cpp(116): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-d:\projects\bignumassignment\project1\source.cpp(219): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-d:\projects\bignumassignment\project1\source.cpp(245): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-d:\projects\bignumassignment\project1\source.cpp(200): warning C4715: 'conHexBin': not all control paths return a value
-  LINK : D:\Projects\BigNumAssignment\x64\Debug\Project1.exe not found or not built by the last incremental link; performing full link
+d:\projects\bignumassignment\project1\source.cpp(119): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+d:\projects\bignumassignment\project1\source.cpp(222): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+d:\projects\bignumassignment\project1\source.cpp(248): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+d:\projects\bignumassignment\project1\source.cpp(203): warning C4715: 'conHexBin': not all control paths return a value
   Project1.vcxproj -> D:\Projects\BigNumAssignment\x64\Debug\Project1.exe
