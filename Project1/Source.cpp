@@ -24,21 +24,21 @@ public:
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
 	void printBin();
-	string addBits(binary first, binary second);
-	string clearBitZeroes(string bin);
+	static binary addBits(binary first, binary second);
+	static string clearBitZeroes(string bin);
 };
 
 int main()
 {
 	string a = "15";
-	string b = "9";
+	string b = "15";
 	QInt q1(10, a);
 	QInt q2(10, b);
-	QInt q3(10, "2");
 	
 	q1.printBin();
 	q2.printBin();
-	cout << "\nResult: " << q3.addBits(q1.getBits(), q2.getBits());
+	//
+	cout << "\nResult: " << QInt::clearBitZeroes(QInt::addBits(q1.getBits(), q2.getBits()).to_string());
 
 	cout << "\n";
 	system("pause");
@@ -51,16 +51,14 @@ QInt::QInt()
 
 QInt::QInt(int mode, string str)
 {
-	string currentBit;
 
 	if (mode == 2)
 		bit = binary(str);
 
 	if (mode == 10)
 	{	
-		currentBit = strBigDecToBin(str);
-		bit = binary(currentBit);
-		tempBit = clearBitZeroes(currentBit);
+		tempBit = strBigDecToBin(str);
+		bit = binary(tempBit);
 	}	
 
 	if (mode == 16)
@@ -194,11 +192,10 @@ string QInt::strBigHexToBin(string str)
 
 void QInt::printBin()
 {
-	// ASK: theo yêu cầu của thầy là không in những số 0 đầu?
-	 cout << tempBit << endl;
+	cout << clearBitZeroes(tempBit) << endl;
 }
 
-string QInt::addBits(binary first, binary second)
+binary QInt::addBits(binary first, binary second)
 {
 	string str1 = first.to_string();
 	string str2 = second.to_string();
@@ -222,9 +219,7 @@ string QInt::addBits(binary first, binary second)
 		result = '1' + result;
 	}
 
-	result = clearBitZeroes(result);
-
-	return result;
+	return binary(result);
 }
 
 string QInt::clearBitZeroes(string bin)
