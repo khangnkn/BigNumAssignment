@@ -36,7 +36,6 @@ int main()
 	string b = "0x123";
 	QInt m(10, a);
 	QInt n(16, b);
-	cout
 	cout << a;
 	cout << b;
 
