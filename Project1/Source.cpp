@@ -25,12 +25,13 @@ public:
 	static string strBigHexToBin(string str);
 	void printBin();
 	static binary addBits(binary first, binary second);
+	static binary subtractBits(binary first, binary second);
 	static string clearBitZeroes(string bin);
 };
 
 int main()
 {
-	string a = "15";
+	string a = "16";
 	string b = "15";
 	QInt q1(10, a);
 	QInt q2(10, b);
@@ -38,7 +39,7 @@ int main()
 	q1.printBin();
 	q2.printBin();
 	//
-	cout << "\nResult: " << QInt::clearBitZeroes(QInt::addBits(q1.getBits(), q2.getBits()).to_string());
+	cout << "\nResult: " << QInt::clearBitZeroes(QInt::subtractBits(q1.getBits(), q2.getBits()).to_string());
 
 	cout << "\n";
 	system("pause");
@@ -221,6 +222,39 @@ binary QInt::addBits(binary first, binary second)
 
 	return binary(result);
 }
+
+binary QInt::subtractBits(binary first, binary second)
+{
+	string str1 = first.to_string();
+	string str2 = second.to_string();
+	string result;
+	int carry = 0; //Initialize carry
+
+	for (int i = MAXBITS; i >= 0; i--)
+	{
+		int firstBit = str1.at(i) - '0';
+		int secondBit = str2.at(i) - '0';
+		// boolean expression for sum of 3 bits
+		int sub = (firstBit ^ secondBit ^ carry) + '0';
+
+		result = char(sub) + result;
+
+		// boolean expression for 3-bit addition
+		if (firstBit == 0 && secondBit == 1)
+		{
+			carry = 1;
+		}
+		else
+		{
+			carry = 0;
+		}
+		
+	}
+
+
+	return binary(result);
+}
+
 
 string QInt::clearBitZeroes(string bin)
 {
