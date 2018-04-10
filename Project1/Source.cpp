@@ -5,6 +5,7 @@
 #include <bitset>
 using namespace std;
 
+#define ONE QInt(10,"1");
 
 typedef bitset<128> binary;
 
@@ -12,19 +13,20 @@ typedef bitset<128> binary;
 class QInt
 {
 private:
-	binary bit;
+	bitset<128> bit;
 public:
 	QInt();
 	QInt(int mode, string str);
-	QInt operator=(QInt const &Qi);
-	friend QInt operator+(QInt Qi_1, QInt Qi_2);
 	~QInt();
 	string convertToDec();
 	string convertToHex();
+
+	QInt & operator=(const QInt & index);
+	friend QInt operator+(const QInt & first, const QInt & second);
 	//private:
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
-	void printBin();
+	string normalize();
 
 };
 
@@ -33,40 +35,51 @@ void MultByTwo(string & result);
 
 int main()
 {
-	string str_bits = "1001000001011000110010000111000000100110010011011101000001011101111110010011010101000101011001010";
-	QInt num(2, str_bits);
-	cout << num.convertToDec();
+	string str_bits = "";
+	QInt index(10, str_bits);
+
+	cout << index.normalize() << endl << index.normalize().length();
 	system("pause");
 	return 0;
 }
 
 QInt::QInt()
 {
+	int i = 0;
+	while (i < 128)
+	{
+		bit[i] = 0;
+	}
 }
 
 QInt::QInt(int mode, string str)
 {
 	if (mode == 2)
-		bit = binary(str);
+		bit = bitset<128>(str);
 	if (mode == 10)
 	{
-		string bstr = strBigDecToBin(str);
-		bit = binary(bstr);
-	}	
+		bool negative = (str[0] == '-') ? true : false;
+
+		// nếu âm
+		if (negative)
+		{
+			str = str.substr(1);	// cắt bỏ '-' trong str
+		}
+		str = strBigDecToBin(str);
+		bit = bitset<128>(str);	// chuyển bit
+
+		if (negative)
+		{
+			bit = ~bit;				// bù 1
+			*this = *this + ONE;	// bù 2
+		}
+	}
 	if (mode == 16)
 	{
 		string hstr = strBigHexToBin(str);
-		bit = binary(hstr);
+		bit = bitset<128>(hstr);
 	}
 }
-
-QInt QInt::operator=(QInt const & Qi)
-{
-	this->bit = Qi.bit;
-	return Qi;
-}
-
-
 
 QInt::~QInt()
 {
@@ -75,7 +88,6 @@ QInt::~QInt()
 string QInt::convertToDec()
 {
 	string str_bit = bit.to_string();
-
 	string result = "0000000000000000000000000000000000000000\0";	// result hiển thị giá trị thập phân (16 byte ~ 40 kí tự) 
 
 	// đánh dấu bit 1 đầu tiên
@@ -110,7 +122,7 @@ string QInt::convertToDec()
 string QInt::convertToHex()
 {
 	string str_bits = bit.to_string();
-	
+
 	// chuẩn hóa dãy bit (nhóm 4 bit)
 	int i = 0, pos = 0;
 	while (str_bits[i] == '0')
@@ -130,8 +142,8 @@ string QInt::convertToHex()
 	while (i < str_bits.length())
 	{
 		temp = temp * 2 + add;
-		
-		if ((i+1) % 4 == 0)
+
+		if ((i + 1) % 4 == 0)
 		{
 			if (temp <= 9)
 			{
@@ -160,6 +172,19 @@ string QInt::convertToHex()
 	return result;
 }
 
+QInt & QInt::operator=(const QInt & index)
+{
+	int i = 0;
+
+	while (i < 128)
+	{
+		this->bit[i] = index.bit[i];
+		i++;
+	}
+
+	return *this;
+}
+
 //Private functions.
 //These functions support calculating process.
 bool carry(string str)
@@ -183,6 +208,7 @@ string DivByTwo(string str)
 		result[i] = ((str[i] - '0') / 2 + add + '0');
 
 	}
+
 
 	//loại các phần tử khác 0 đầu
 	while (result[0] == '0' && result.length() != 1)
@@ -208,6 +234,7 @@ string QInt::strBigDecToBin(string str)
 	}
 	return string(bin);
 }
+
 string conHexBin(char c)
 {
 	int swh = c - 48;
@@ -249,6 +276,7 @@ string conHexBin(char c)
 		break;
 	}
 }
+
 string QInt::strBigHexToBin(string str)
 {
 	string result = "";
@@ -258,10 +286,20 @@ string QInt::strBigHexToBin(string str)
 	}
 	return string(result);
 }
-void QInt::printBin()
+
+string QInt::normalize()
 {
-	// ASK: theo yêu cầu của thầy là không in những số 0 đầu?
-	cout << bit << endl;
+	string str_bits = bit.to_string();
+	int i = 0;
+	int pos = i;
+
+	while (str_bits[i] == str_bits[i + 1])
+	{
+		if ((str_bits.length() - i - 1) % 4 == 0)
+			pos = i;
+		i++;
+	}
+	return str_bits.substr(pos + 1);
 }
 
 void MultByTwo(string & result)
@@ -279,18 +317,6 @@ void MultByTwo(string & result)
 	result = copy;
 }
 
-QInt operator+(QInt Qi_1, QInt Qi_2)
-{
-	QInt qResult;
-	while (Qi_2.bit.to_ullong() != 0)
-	{
-		binary carry = Qi_1.bit & Qi_2.bit;
-		Qi_1.bit = Qi_1.bit ^ Qi_2.bit;
-		Qi_2.bit = carry << 1;
-	}
-
-	return QInt(Qi_1);
-}
 void PlusOne(string & result)
 {
 	int i = result.length() - 1;
@@ -302,4 +328,31 @@ void PlusOne(string & result)
 		result[i] = (result[i] - '0' + carry) % 10 + '0';
 		carry = temp / 10;
 	}
+}
+
+QInt operator+(const QInt & first, const QInt & second)
+{
+	string str1 = first.bit.to_string();
+	string str2 = second.bit.to_string();
+	string result;
+	int carry = 0; //Initialize carry
+
+	for (int i = 127; i >= 0; i--)
+	{
+		int firstBit = str1.at(i) - '0';
+		int secondBit = str2.at(i) - '0';
+		// boolean expression for sum of 3 bits
+		int sum = (firstBit ^ secondBit ^ carry) + '0';
+
+		result = char(sum) + result;
+
+		// boolean expression for 3-bit addition
+		carry = (firstBit & secondBit) | (secondBit & carry) | (firstBit & carry);
+	}
+	if (carry)
+	{
+		result = '1' + result;
+	}
+
+	return QInt(2, result);
 }
