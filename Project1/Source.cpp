@@ -130,10 +130,22 @@ string QInt::strBigDecToBin(string str)
 {
 	// ASK: nếu str < 0 thì sao?
 	string bin = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-	for (int i = 0; i < 128 && str != "0"; i++)
+	if (str[0] != '-')
 	{
-		bin[127 - i] = carry(str) + 48;
-		str = DivByTwo(str);
+		for (int i = 0; i < 128 && str != "0"; i++)
+		{
+			bin[127 - i] = carry(str) + 48;
+			str = DivByTwo(str);
+		}
+	}
+	else
+	{
+		str = str.substr(1);
+		str = QInt::strBigDecToBin(str);
+		binary tstr(str);
+		binary tbin;
+		tstr = tstr ^ tbin;
+
 	}
 	return bin;
 }
@@ -225,7 +237,6 @@ binary QInt::addBits(binary first, binary second)
 string QInt::clearBitZeroes(string bin)
 {
 	string tempBin = bin;
-	int temp = 0;
 
 	for (int i = 0; i < MAXBITS; i++)
 	{
