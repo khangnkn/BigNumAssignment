@@ -146,7 +146,9 @@ string QInt::strBigDecToBin(string str)
 		binary tstr(str);
 		binary tbin;
 		tstr = tstr ^ tbin;
-
+		tbin.set(MAXBITS, 1);
+		tstr = QInt::addBits(tstr, tbin)
+		bin = tstr.to_string();
 	}
 	return bin;
 }
