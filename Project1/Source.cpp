@@ -28,6 +28,10 @@ public:
 	friend QInt operator|(const QInt & index_1, const QInt & index_2);
 	friend QInt operator^(const QInt & index_1, const QInt & index_2);
 	friend QInt operator~(const QInt & index);
+	friend QInt operator>>(const QInt & index, int step);
+	friend QInt operator<<(const QInt & index, int step);
+	QInt rol();
+	QInt ror();
 	//Converter
 	string convertToDec();
 	string convertToHex();
@@ -412,4 +416,38 @@ QInt operator~(const QInt & index)
 	QInt result;
 	result.bit = ~index.bit;
 	return QInt(result);
+}
+
+QInt operator>>(const QInt & index, int step)
+{
+	QInt result;
+	result.bit = index.bit >> step;
+	return QInt(result);
+}
+
+QInt operator<<(const QInt & index, int step)
+{
+	QInt result;
+	result.bit = index.bit << step;
+	return QInt(result);
+}
+
+QInt QInt::rol()
+{
+	QInt result;
+	bool index;
+	index = this->bit[0];
+	result.bit = this->bit << 1;
+	result.bit.set(MAXBITS, index);
+	return QInt(result); 
+}
+
+QInt QInt::ror()
+{
+	QInt result;
+	bool index;
+	index = this->bit[MAXBITS];
+	result.bit = this->bit >> 1;
+	result.bit.set(0, index);
+	return QInt(result); 
 }
