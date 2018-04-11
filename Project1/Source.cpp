@@ -23,11 +23,12 @@ public:
 
 	QInt & operator=(const QInt & index);
 	friend QInt operator+(const QInt & first, const QInt & second);
+	friend QInt operator-(const QInt & first, const QInt & second);
 	//private:
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
 	string normalize();
-
+	void toString();
 };
 
 void PlusOne(string & result);
@@ -35,10 +36,10 @@ void MultByTwo(string & result);
 
 int main()
 {
-	string str_bits = "";
-	QInt index(10, str_bits);
+	//QInt a(10, "-9963874596630475205687524");
+	QInt a(2, "11111111111111111111111111111111111111111111011111000010000100010100011010011010101100101011010111010110111010010100011100011100");
+	cout << a.convertToDec();
 
-	cout << index.normalize() << endl << index.normalize().length();
 	system("pause");
 	return 0;
 }
@@ -90,32 +91,42 @@ string QInt::convertToDec()
 	string str_bit = bit.to_string();
 	string result = "0000000000000000000000000000000000000000\0";	// result hiển thị giá trị thập phân (16 byte ~ 40 kí tự) 
 
-	// đánh dấu bit 1 đầu tiên
-	int i = 0;
-	while (i < str_bit.length() && str_bit[i] == 48)
+	bool negative = (str_bit[0] == '1') ? true : false;
+	str_bit = this->normalize();
+
+
+	// nếu âm
+	if (negative)
 	{
-		i++;
+		QInt abs_bit = *this;
+		abs_bit = abs_bit - QInt(10, "1");	// abs_bit là bù 1
+		abs_bit.bit = ~(abs_bit.bit);		// abs_bit là thể hiện nhị phân của trị tuyệt đối decimal
+		str_bit = abs_bit.normalize();
 	}
 
 	// duyệt chuỗi nhị phân từ trái sang phải
+	int i = 0;
 	char add = str_bit[i] - '0';
 
-	while (i < 128)
+	while (i < str_bit.length())
 	{
 		MultByTwo(result);		// nhân 2
 		if (add == 1)
 			PlusOne(result);	// cộng bit tiếp theo
 
 		i++;
-		add = str_bit[i] - '0';
+		if (i < str_bit.length())
+			add = str_bit[i] - '0';
 	}
-
-	// loại bỏ các phần tử 0 đầu
-	while (result[0] == '0' && result.length() != 1)
+	// cắt bỏ các số 0 đầu
+	i = 0;
+	while (result[i] == '0')
 	{
-		result = result.substr(1);
+		i++;
 	}
-
+	if (negative)
+		result = result.substr(i - 1), result[0] = '-';
+	else result = result.substr(i);
 	return result;
 }
 
@@ -302,6 +313,11 @@ string QInt::normalize()
 	return str_bits.substr(pos + 1);
 }
 
+void QInt::toString()
+{
+	cout << bit;
+}
+
 void MultByTwo(string & result)
 {
 	string copy = result;
@@ -353,6 +369,37 @@ QInt operator+(const QInt & first, const QInt & second)
 	{
 		result = '1' + result;
 	}
+
+	return QInt(2, result);
+}
+
+QInt operator-(const QInt & first, const QInt & second) {
+	string str1 = first.bit.to_string();
+	string str2 = second.bit.to_string();
+	string result;
+	int carry = 0; //Initialize carry
+
+	for (int i = 127; i >= 0; i--)
+	{
+		int firstBit = str1.at(i) - '0';
+		int secondBit = str2.at(i) - '0';
+		// boolean expression for sum of 3 bits
+		int sub = (firstBit ^ secondBit ^ carry) + '0';
+
+		result = char(sub) + result;
+
+		// boolean expression for 3-bit addition
+		if (firstBit == 0 && (secondBit+carry) >=1 )
+		{
+			carry = 1;
+		}
+		else
+		{
+			carry = 0;
+		}
+
+	}
+
 
 	return QInt(2, result);
 }
