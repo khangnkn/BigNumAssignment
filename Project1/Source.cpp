@@ -21,9 +21,11 @@ public:
 	QInt(const QInt & index);
 	QInt(int mode, string str);
 	~QInt();
+	binary getBits();
 	//Calculating
 	QInt operator=(QInt const & index);
 	friend QInt operator+(const QInt & first, const QInt & second);
+	friend QInt operator-(const QInt & first, const QInt & second);
 	friend QInt operator&(const QInt & index_1, const QInt & index_2);
 	friend QInt operator|(const QInt & index_1, const QInt & index_2);
 	friend QInt operator^(const QInt & index_1, const QInt & index_2);
@@ -48,6 +50,12 @@ string conHexBin(char c);
 
 int main()
 {
+	string a = "13";
+	string b = "3";
+	QInt q1 = QInt(10, a);
+	QInt q2 = QInt(10, b);
+	cout << "\nResult: " << (q1 - q2).getBits().to_string();
+
 	cout << "\n";
 	system("pause");
 	return 0;
@@ -100,6 +108,11 @@ QInt QInt::operator=(QInt const & index)
 
 QInt::~QInt()
 {
+}
+
+binary QInt::getBits()
+{
+	return this->bit;
 }
 
 string QInt::convertToDec()
@@ -388,6 +401,11 @@ QInt operator+(const QInt & first, const QInt & second)
 	}
 
 	return QInt(2, result);
+}
+
+QInt operator-(const QInt & first, const QInt & second)
+{
+	return (first + (~second + QInt(10, "1"))) << 1;
 }
 
 QInt operator&(const QInt & index_1, const QInt & index_2)
