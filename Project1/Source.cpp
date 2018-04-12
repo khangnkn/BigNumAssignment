@@ -38,7 +38,7 @@ void MultByTwo(string & result);
 
 int main()
 {
-	QInt a(10, "-5"), b(10, "16");
+	QInt a(10, "-7234682"), b(10, "7234682");
 	cout << "a: "; a.toString(); cout << endl;
 	cout << "b: "; b.toString(); cout << endl;
 	cout << "c: ";
@@ -419,10 +419,6 @@ QInt operator+(const QInt & first, const QInt & second)
 
 		// boolean expression for 3-bit addition
 		carry = (firstBit & secondBit) | (secondBit & carry) | (firstBit & carry);
-	}
-	if (carry)
-	{
-		result = '1' + result;
 	}
 
 	return QInt(2, result);
