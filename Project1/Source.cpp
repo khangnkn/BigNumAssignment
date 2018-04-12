@@ -7,6 +7,8 @@ using namespace std;
 
 typedef bitset<128> binary;
 
+#define ONE QInt(10,"1")
+
 // acctually, QInt is a big binary
 class QInt
 {
@@ -36,11 +38,11 @@ void MultByTwo(string & result);
 
 int main()
 {
-	QInt a(10, "-5"), b(10, "7");
-	a.toString(); cout << endl; 
-	b.toString(); cout << endl;
+	QInt a(10, "-5"), b(10, "16");
+	cout << "a: "; a.toString(); cout << endl;
+	cout << "b: "; b.toString(); cout << endl;
+	cout << "c: ";
 	(a + b).toString(); cout << endl;
-
 	system("pause");
 	return 0;
 }
@@ -58,6 +60,7 @@ QInt::QInt(int mode, string str)
 {
 	if (mode == 2)
 		bit = bitset<128>(str);
+
 	if (mode == 10)
 	{
 		bool negative = (str[0] == '-') ? true : false;
@@ -68,45 +71,63 @@ QInt::QInt(int mode, string str)
 			str = str.substr(1);	// cắt bỏ '-' trong str
 		}
 		str = strBigDecToBin(str);
-
-		string str_bits = QInt(2, "0").bit.to_string(); // chuỗi nhị phân rỗng
+		bit = bitset<128>(str);	// chuyển bit
 
 		if (negative)
 		{
-			// chuỗi bù 1
-			int i = str_bits.length() - 1;
-			while (i >= 0)
-			{
-				int pos = i - (str_bits.length() - str.length());
-				if (pos < 0)
-				{
-					str_bits[i] = '1';
-				}
-				else
-					str_bits[i] = '1' - (str[pos] - '0');
-				i--;
-			}
-
-			i = str_bits.length() - 1;
-			// chuỗi bù 2
-			int carry = 1;
-
-			while (carry != 0)
-			{
-				int temp = 0;
-				temp = str_bits[i] - '0' + carry;
-				carry = (temp > 1) ? 1 : 0;
-				temp %= 2;
-				str_bits[i] = temp + '0';
-				i--;
-			}
-
-			bit = bitset<128>(str_bits);
+			bit = ~bit;				// bù 1
+			*this = *this + ONE;	// bù 2
 		}
-		else
-			bit = bitset<128>(str);
-
 	}
+	//if (mode == 10)
+	//{
+	//	bool negative = (str[0] == '-') ? true : false;
+
+	//	// nếu âm
+	//	if (negative)
+	//	{
+	//		str = str.substr(1);	// cắt bỏ '-' trong str
+	//	}
+	//	str = strBigDecToBin(str);
+
+	//	string str_bits = QInt(2, "0").bit.to_string(); // chuỗi nhị phân rỗng
+
+	//	if (negative)
+	//	{
+	//		// chuỗi bù 1
+	//		int i = str_bits.length() - 1;
+	//		while (i >= 0)
+	//		{
+	//			int pos = i - (str_bits.length() - str.length());
+	//			if (pos < 0)
+	//			{
+	//				str_bits[i] = '1';
+	//			}
+	//			else
+	//				str_bits[i] = '1' - (str[pos] - '0');
+	//			i--;
+	//		}
+
+	//		i = str_bits.length() - 1;
+	//		// chuỗi bù 2
+	//		int carry = 1;
+
+	//		while (carry != 0)
+	//		{
+	//			int temp = 0;
+	//			temp = str_bits[i] - '0' + carry;
+	//			carry = (temp > 1) ? 1 : 0;
+	//			temp %= 2;
+	//			str_bits[i] = temp + '0';
+	//			i--;
+	//		}
+
+	//		bit = bitset<128>(str_bits);
+	//	}
+	//	else
+	//		bit = bitset<128>(str);
+
+	//}
 	if (mode == 16)
 	{
 		string hstr = strBigHexToBin(str);
