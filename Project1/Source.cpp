@@ -13,12 +13,12 @@ typedef bitset<128> binary;
 // acctually, QInt is a big binary
 class QInt
 {
-private:
+public:
 	binary bit;
 public:
 	//Constructor and Destructor
 	QInt();
-	QInt(const QInt & index);
+	QInt(const QInt & index); //all done. works with negative
 	QInt(int mode, string str);
 	~QInt();
 	//Calculating
@@ -50,7 +50,15 @@ string conHexBin(char c);
 
 int main()
 {
+	QInt n(10, "15");
+	QInt m(10, "3");
+	n.print(16);
+	cout << endl;
+	m.print(2);
+	cout << endl;
+	(n + m).print(2);
 	cout << "\n";
+
 	system("pause");
 	return 0;
 }
@@ -144,7 +152,7 @@ string QInt::convertToHex()
 
 	// chuẩn hóa dãy bit (nhóm 4 bit)
 	int i = 0, pos = 0;
-	while (str_bits[i] == '0')
+	while (str_bits[i] == str_bits[i - 1])
 	{
 		if ((str_bits.length() - i - 1) % 4 == 0)
 			pos = i;
@@ -275,7 +283,7 @@ void QInt::print(int mode)
 	}
 	if (mode == 16)
 	{
-		result = this->convertToHex();
+		cout << "0x";		result = this->convertToHex();
 	}
 	cout << result;
 }
@@ -328,7 +336,7 @@ string QInt::normalize()
 	int i = 0;
 	int pos = i;
 
-	while (str_bits[i] == str_bits[i + 1])
+	while (str_bits[i] == str_bits[i - 1])
 	{
 		if ((str_bits.length() - i - 1) % 4 == 0)
 			pos = i;
@@ -372,7 +380,7 @@ QInt operator+(const QInt & first, const QInt & second)
 	string result;
 	int carry = 0; //Initialize carry
 
-	for (int i = 127; i >= 0; i--)
+	for (int i = MAXBITS; i >= 0; i--)
 	{
 		int firstBit = str1.at(i) - '0';
 		int secondBit = str2.at(i) - '0';
@@ -524,7 +532,7 @@ QInt QInt::rol()
 	bool index;
 	index = this->bit[0];
 	result.bit = this->bit << 1;
-	result.bit.set(MAXBITS, index);
+	result.bit.set(0, 1);
 	return QInt(result); 
 }
 
@@ -534,6 +542,6 @@ QInt QInt::ror()
 	bool index;
 	index = this->bit[MAXBITS];
 	result.bit = this->bit >> 1;
-	result.bit.set(0, index);
+	result.bit.set(MAXBITS, 1);
 	return QInt(result); 
 }
