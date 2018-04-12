@@ -50,15 +50,12 @@ string conHexBin(char c);
 
 int main()
 {
-	QInt n(10, "15");
-	QInt m(10, "3");
-	n.print(16);
-	cout << endl;
-	m.print(2);
-	cout << endl;
-	(n + m).print(2);
-	cout << "\n";
-
+	QInt a(10, "-3"), b(10, "6");
+	cout << "\n---" << endl;
+	a.print(2); cout << endl;
+	b.print(2); cout << endl;
+	cout << "\n-----\n";
+	(a - b).print(2); cout << endl;
 	system("pause");
 	return 0;
 }
@@ -393,43 +390,12 @@ QInt operator+(const QInt & first, const QInt & second)
 		// boolean expression for 3-bit addition
 		carry = (firstBit & secondBit) | (secondBit & carry) | (firstBit & carry);
 	}
-	if (carry)
-	{
-		result = '1' + result;
-	}
-
 	return QInt(2, result);
 }
 
-QInt operator-(const QInt & first, const QInt & second) {
-	string str1 = first.bit.to_string();
-	string str2 = second.bit.to_string();
-	string result;
-	int carry = 0; //Initialize carry
-
-	for (int i = 127; i >= 0; i--)
-	{
-		int firstBit = str1.at(i) - '0';
-		int secondBit = str2.at(i) - '0';
-		// boolean expression for sum of 3 bits
-		int sub = (firstBit ^ secondBit ^ carry) + '0';
-
-		result = char(sub) + result;
-
-		// boolean expression for 3-bit addition
-		if (firstBit == 0 && (secondBit + carry) >= 1)
-		{
-			carry = 1;
-		}
-		else
-		{
-			carry = 0;
-		}
-
-	}
-
-
-	return QInt(2, result);
+QInt operator-(const QInt & first, const QInt & second)
+{
+	return first + (~second + QInt(10, "1"));
 }
 
 QInt operator*(const QInt & first, const QInt & second)
