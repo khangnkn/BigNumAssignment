@@ -283,7 +283,8 @@ void QInt::print(int mode)
 	}
 	if (mode == 16)
 	{
-		cout << "0x";		result = this->convertToHex();
+		cout << "0x";	
+		result = this->convertToHex();
 	}
 	cout << result;
 }
@@ -380,7 +381,7 @@ QInt operator+(const QInt & first, const QInt & second)
 	string result;
 	int carry = 0; //Initialize carry
 
-	for (int i = MAXBITS; i >= 0; i--)
+	for (int i = 127; i >= 0; i--)
 	{
 		int firstBit = str1.at(i) - '0';
 		int secondBit = str2.at(i) - '0';
