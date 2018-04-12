@@ -50,15 +50,12 @@ string conHexBin(char c);
 
 int main()
 {
-	QInt n(10, "15");
-	QInt m(10, "3");
-	n.print(16);
-	cout << endl;
-	m.print(2);
-	cout << endl;
-	(n + m).print(2);
-	cout << "\n";
-
+	QInt a(10, "-1"), b(10, "0");
+	cout << "\n---" << endl;
+	a.print(2); cout << endl;
+	b.print(2); cout << endl;
+	cout << "\n-----\n";
+	(a + b).print(2); cout << endl;
 	system("pause");
 	return 0;
 }
@@ -393,11 +390,6 @@ QInt operator+(const QInt & first, const QInt & second)
 		// boolean expression for 3-bit addition
 		carry = (firstBit & secondBit) | (secondBit & carry) | (firstBit & carry);
 	}
-	if (carry)
-	{
-		result = '1' + result;
-	}
-
 	return QInt(2, result);
 }
 
@@ -425,7 +417,6 @@ QInt operator-(const QInt & first, const QInt & second) {
 		{
 			carry = 0;
 		}
-
 	}
 
 
