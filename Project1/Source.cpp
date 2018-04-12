@@ -50,13 +50,13 @@ string conHexBin(char c);
 
 int main()
 {
-	string a = "-5";
+	string a = "26";
 	string b = "16";
 	QInt q1 = QInt(10, a);
 	QInt q2 = QInt(10, b);
 	cout << "\nQ1: " << q1.getBits().to_string();
 	cout << "\nQ2: " << q2.getBits().to_string();
-	QInt q3 = q1 + q2;
+	QInt q3 = q1 - q2;
 	cout << "\nABCXYZ: " << q3.getBits().to_string();
 	//cout << "\nResult: " << (~(q3 - QInt(10, "1")).getBits()).to_string();
 	cout << "\n";
@@ -408,7 +408,7 @@ QInt operator+(const QInt & first, const QInt & second)
 
 QInt operator-(const QInt & first, const QInt & second)
 {
-	return (first + (~second + QInt(10, "1"))) << 1;
+	return first + (~second + QInt(10, "1"));
 }
 
 QInt operator&(const QInt & index_1, const QInt & index_2)
