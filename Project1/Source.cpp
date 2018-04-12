@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cmath>
 #include <string>
 #include <sstream>
@@ -13,17 +13,19 @@ typedef bitset<128> binary;
 // acctually, QInt is a big binary
 class QInt
 {
-private:
+public:
 	binary bit;
 public:
 	//Constructor and Destructor
 	QInt();
-	QInt(const QInt & index);
+	QInt(const QInt & index); //all done. works with negative
 	QInt(int mode, string str);
 	~QInt();
 	//Calculating
 	QInt operator=(QInt const & index);
 	friend QInt operator+(const QInt & first, const QInt & second);
+	friend QInt operator-(const QInt & first, const QInt & second);
+	friend QInt operator*(const QInt & first, const QInt & second);
 	friend QInt operator&(const QInt & index_1, const QInt & index_2);
 	friend QInt operator|(const QInt & index_1, const QInt & index_2);
 	friend QInt operator^(const QInt & index_1, const QInt & index_2);
@@ -48,7 +50,15 @@ string conHexBin(char c);
 
 int main()
 {
+	QInt n(10, "15");
+	QInt m(10, "3");
+	n.print(16);
+	cout << endl;
+	m.print(2);
+	cout << endl;
+	(n + m).print(2);
 	cout << "\n";
+
 	system("pause");
 	return 0;
 }
@@ -142,7 +152,7 @@ string QInt::convertToHex()
 
 	// chuẩn hóa dãy bit (nhóm 4 bit)
 	int i = 0, pos = 0;
-	while (str_bits[i] == '0')
+	while (str_bits[i] == str_bits[i - 1])
 	{
 		if ((str_bits.length() - i - 1) % 4 == 0)
 			pos = i;
@@ -273,6 +283,7 @@ void QInt::print(int mode)
 	}
 	if (mode == 16)
 	{
+		cout << "0x";	
 		result = this->convertToHex();
 	}
 	cout << result;
@@ -326,7 +337,7 @@ string QInt::normalize()
 	int i = 0;
 	int pos = i;
 
-	while (str_bits[i] == str_bits[i + 1])
+	while (str_bits[i] == str_bits[i - 1])
 	{
 		if ((str_bits.length() - i - 1) % 4 == 0)
 			pos = i;
@@ -390,6 +401,90 @@ QInt operator+(const QInt & first, const QInt & second)
 	return QInt(2, result);
 }
 
+QInt operator-(const QInt & first, const QInt & second) {
+	string str1 = first.bit.to_string();
+	string str2 = second.bit.to_string();
+	string result;
+	int carry = 0; //Initialize carry
+
+	for (int i = 127; i >= 0; i--)
+	{
+		int firstBit = str1.at(i) - '0';
+		int secondBit = str2.at(i) - '0';
+		// boolean expression for sum of 3 bits
+		int sub = (firstBit ^ secondBit ^ carry) + '0';
+
+		result = char(sub) + result;
+
+		// boolean expression for 3-bit addition
+		if (firstBit == 0 && (secondBit + carry) >= 1)
+		{
+			carry = 1;
+		}
+		else
+		{
+			carry = 0;
+		}
+
+	}
+
+
+	return QInt(2, result);
+}
+
+QInt operator*(const QInt & first, const QInt & second)
+{
+	string str1 = first.bit.to_string();
+	string str2 = second.bit.to_string();
+	string result = QInt(10, "0").bit.to_string();
+
+	// làm gọn str1
+	int i = 1;
+	int pos = i;
+	while (str1[i] == str1[i - 1])
+	{
+		if ((str1.length() - i - 1) % 4 == 0)
+			pos = i;
+		i++;
+	}
+	str1 = str1.substr(pos + 1);
+
+	// làm gọn str2
+	i = 1, pos = 0;
+	while (str2[i] == str2[i - 1])
+	{
+		if ((str2.length() - i - 1) % 4 == 0)
+			pos = i;
+		i++;
+	}
+	str2 = str2.substr(pos + 1);
+	
+	result = result.substr(0, str1.length() + str2.length());	// điều chỉnh độ dài result
+
+	// xây dựng chuỗi kết quả
+	char carry = '0';
+	for (int i = str1.length() - 1; i >= 0; i--)
+	{
+		for (int j = str2.length() - 1; j >= 0; j--)
+		{
+			result[i + j + 1] += (carry - '0');
+			result[i + j + 1] += (((str1[i] == '0') ? '0' : str2[j]) - '0');
+
+			if (result[i + j + 1] > '1')
+			{
+				carry = '1';
+				result[i + j + 1] = ((result[i + j + 1] - '0') % 2) + '0';
+			}
+			else carry = '0';
+
+			if(i==0&&j==0)
+				result[i + j] += (carry - '0');
+		}
+	}
+	
+	return QInt(2, result);
+}
+
 QInt operator&(const QInt & index_1, const QInt & index_2)
 {
 	QInt result;
@@ -438,7 +533,7 @@ QInt QInt::rol()
 	bool index;
 	index = this->bit[0];
 	result.bit = this->bit << 1;
-	result.bit.set(MAXBITS, index);
+	result.bit.set(0, 1);
 	return QInt(result); 
 }
 
@@ -448,6 +543,6 @@ QInt QInt::ror()
 	bool index;
 	index = this->bit[MAXBITS];
 	result.bit = this->bit >> 1;
-	result.bit.set(0, index);
+	result.bit.set(MAXBITS, 1);
 	return QInt(result); 
 }
