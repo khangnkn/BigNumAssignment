@@ -36,8 +36,11 @@ void MultByTwo(string & result);
 
 int main()
 {
-	QInt a(2, "11100101101010"), b(2, "10010100101010111");
-	cout<<(a*b).normalize();
+	QInt a(10, "-5"), b(10, "7");
+	a.toString(); cout << endl; 
+	b.toString(); cout << endl;
+	(a + b).toString(); cout << endl;
+
 	system("pause");
 	return 0;
 }
@@ -65,13 +68,44 @@ QInt::QInt(int mode, string str)
 			str = str.substr(1);	// cắt bỏ '-' trong str
 		}
 		str = strBigDecToBin(str);
-		bit = bitset<128>(str);	// chuyển bit
+
+		string str_bits = QInt(2, "0").bit.to_string(); // chuỗi nhị phân rỗng
 
 		if (negative)
 		{
-			bit = ~bit;						// bù 1
-			*this = *this + QInt(10, "1");	// bù 2
+			// chuỗi bù 1
+			int i = str_bits.length() - 1;
+			while (i >= 0)
+			{
+				int pos = i - (str_bits.length() - str.length());
+				if (pos < 0)
+				{
+					str_bits[i] = '1';
+				}
+				else
+					str_bits[i] = '1' - (str[pos] - '0');
+				i--;
+			}
+
+			i = str_bits.length() - 1;
+			// chuỗi bù 2
+			int carry = 1;
+
+			while (carry != 0)
+			{
+				int temp = 0;
+				temp = str_bits[i] - '0' + carry;
+				carry = (temp > 1) ? 1 : 0;
+				temp %= 2;
+				str_bits[i] = temp + '0';
+				i--;
+			}
+
+			bit = bitset<128>(str_bits);
 		}
+		else
+			bit = bitset<128>(str);
+
 	}
 	if (mode == 16)
 	{
@@ -309,7 +343,8 @@ string QInt::normalize()
 		i++;
 	}
 
-	return str_bits.substr(pos + 1);
+	str_bits = str_bits.substr(pos + 1);
+	return str_bits;
 }
 
 void QInt::toString()
@@ -399,7 +434,6 @@ QInt operator-(const QInt & first, const QInt & second) {
 
 	}
 
-
 	return QInt(2, result);
 }
 
@@ -429,7 +463,7 @@ QInt operator*(const QInt & first, const QInt & second)
 		i++;
 	}
 	str2 = str2.substr(pos + 1);
-	
+
 	result = result.substr(0, str1.length() + str2.length());	// điều chỉnh độ dài result
 
 	// xây dựng chuỗi kết quả
@@ -448,10 +482,11 @@ QInt operator*(const QInt & first, const QInt & second)
 			}
 			else carry = '0';
 
-			if(i==0&&j==0)
+			if (i == 0 && j == 0)
 				result[i + j] += (carry - '0');
 		}
 	}
-	
+
 	return QInt(2, result);
 }
+
