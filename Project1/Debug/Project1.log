@@ -1,7 +1,0 @@
-﻿  Source.cpp
-e:\learning\bigprojects\bignumassignment\project1\source.cpp(128): warning C4018: '<': signed/unsigned mismatch
-e:\learning\bigprojects\bignumassignment\project1\source.cpp(175): warning C4018: '<': signed/unsigned mismatch
-e:\learning\bigprojects\bignumassignment\project1\source.cpp(223): warning C4018: '<': signed/unsigned mismatch
-e:\learning\bigprojects\bignumassignment\project1\source.cpp(272): warning C4018: '<': signed/unsigned mismatch
-e:\learning\bigprojects\bignumassignment\project1\source.cpp(337): warning C4715: 'conHexBin': not all control paths return a value
-  Project1.vcxproj -> E:\Learning\BigProjects\BigNumAssignment\Debug\Project1.exe
