@@ -55,7 +55,7 @@ int main()
 	a.print(2); cout << endl;
 	b.print(2); cout << endl;
 	cout << "\n-----\n";
-	(a - b).print(2); cout << endl;
+	(a * b).print(2); cout << endl;
 	system("pause");
 	return 0;
 }
