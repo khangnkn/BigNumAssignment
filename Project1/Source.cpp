@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <bitset>
+#include <fstream>
 using namespace std;
 
 #define ONE QInt(10,"1")
@@ -52,9 +53,9 @@ string conHexBin(char c);
 
 int main()
 {
-	QInt a(10, "34546433"), b(10, "-986754398464435");
+	QInt a(10, "60"), b(10, "-120");
 	(a / b).print(10);
-	
+
 	cout << endl;
 
 	system("pause");
@@ -468,13 +469,15 @@ QInt operator*(const QInt & first, const QInt & second)
 
 QInt operator/(const QInt & first, const QInt & second)
 {
+	if (second == QInt(10, "0"))
+	{
+		cout << "Error: divided by ";
+		return second;
+	}
+	
 	string str1 = first.bit.to_string();
 	string str2 = second.bit.to_string();
 	string result;
-
-	// nếu số bị chia nhỏ hơn số chia
-	if (str1 < str2)
-		return QInt(10, "0");
 
 	// xét first, second cùng hay khác dấu
 	bool neg = ((str1[0] != '0'&&str2[0] == '0') || (str1[0] == '0'&&str2[0] != '0')) ? true : false;
@@ -489,8 +492,8 @@ QInt operator/(const QInt & first, const QInt & second)
 	int i = 1;
 	while (str1[i] == str1[i - 1]) i++;
 	str1 = str1.substr(i);
-	
-	
+
+
 	if (str2[0] == '1')
 	{
 		QInt abs_bit = second - QInt(10, "1");	// abs_bit là bù 1
@@ -506,7 +509,7 @@ QInt operator/(const QInt & first, const QInt & second)
 	string temp = str1.substr(0, i);
 	while (i <= str1.length())
 	{
-		char add = ((temp.length()>str2.length())||(temp.length()==str2.length()&&temp>=str2)) ? '1' : '0';
+		char add = ((temp.length() > str2.length()) || (temp.length() == str2.length() && temp >= str2)) ? '1' : '0';
 		result += add;
 		if (add == '1')
 		{
@@ -519,8 +522,12 @@ QInt operator/(const QInt & first, const QInt & second)
 		i++;
 	}
 
+	// nếu số bị chia nhỏ hơn số chia
+	if (str1.length() < str2.length())
+		return QInt(10, "0");
+
 	if (!neg)
-		return QInt(2, result);		
+		return QInt(2, result);
 	else
 		return ~QInt(2, result) + QInt(10, "1");	// bù 2
 }
