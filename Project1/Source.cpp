@@ -1,18 +1,19 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <vector>
 #include <sstream>
+#include <fstream>
 #include <bitset>
 using namespace std;
 
 #define ONE QInt(10,"1")
-
 #define MAXBITS 127
 typedef bitset<128> binary;
 
 class QInt
 {
-public:
+private:
 	binary bit;
 public:
 	//Constructor and Destructor
@@ -39,7 +40,9 @@ public:
 	string convertToHex();
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
-	void print(int mode);
+	//Input - Output system
+	static void input(istream & is);
+	void print(int mode, ostream & os);
 	//Suporting
 	string normalize();
 	//Comparison operators
@@ -52,11 +55,10 @@ string conHexBin(char c);
 
 int main()
 {
-	QInt a(10, "34546433"), b(10, "-986754398464435");
-	(a / b).print(10);
-
-	cout << endl;
-
+	QInt a(10, "-150"), b(10, "-3");
+	fstream f;
+	f.open("Input.txt", ios::in);
+	QInt::input(f);
 	system("pause");
 	return 0;
 }
@@ -284,11 +286,34 @@ string QInt::strBigHexToBin(string str)
 	return string(result);
 }
 
-void QInt::print(int mode)
+
+void QInt::input(istream & is)
+{
+	vector<string> arr_elements;
+	QInt val1, val2;
+	int mode, mode_s;
+	string op;
+	while (is.peek() != '\n')
+	{
+		string tmp;
+		is >> tmp;
+		arr_elements.push_back(tmp);
+	}
+	cout << arr_elements.capacity();
+	op = arr_elements[arr_elements.capacity() - 2];
+	if (op == "+" || op == "-" || op == "*" || op == "/" || op == "&" || op == "|" || op == "^")
+	{
+		mode = stoi(arr_elements[0]);
+		val1 = QInt(mode, arr_elements[1]);
+		val2 = QInt(mode, arr_elements[3]);
+	}
+}
+
+void QInt::print(int mode, ostream & os)
 {
 	if (*this == QInt(2, "0"))
 	{
-		cout << '0';
+		os << '0';
 		return;
 	}
 
@@ -296,6 +321,10 @@ void QInt::print(int mode)
 	if (mode == 2)
 	{
 		result = this->bit.to_string();
+		while (result[0] == '0')
+		{
+			result = result.substr(1);
+		}
 	}
 	if (mode == 10)
 	{
@@ -306,7 +335,7 @@ void QInt::print(int mode)
 		cout << "0x";
 		result = this->convertToHex();
 	}
-	cout << result;
+	os << result;
 }
 
 string conHexBin(char c)
@@ -474,7 +503,7 @@ QInt operator/(const QInt & first, const QInt & second)
 
 	// nếu số bị chia nhỏ hơn số chia
 	if (str1 < str2)
-		return QInt(10, "0");
+		return QInt(10, "0"); //so sanh chua ok
 
 	// xét first, second cùng hay khác dấu
 	bool neg = ((str1[0] != '0'&&str2[0] == '0') || (str1[0] == '0'&&str2[0] != '0')) ? true : false;
