@@ -1,21 +1,20 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+#include <vector>
 #include <sstream>
+#include <fstream>
 #include <bitset>
+#include <fstream>
 using namespace std;
 
 #define ONE QInt(10,"1")
-
 #define MAXBITS 127
 typedef bitset<128> binary;
 
-#define ONE QInt(10,"1")
-
-// acctually, QInt is a big binary
 class QInt
 {
-public:
+private:
 	binary bit;
 public:
 	//Constructor and Destructor
@@ -28,6 +27,7 @@ public:
 	friend QInt operator+(const QInt & first, const QInt & second);
 	friend QInt operator-(const QInt & first, const QInt & second);
 	friend QInt operator*(const QInt & first, const QInt & second);
+	friend QInt operator/(const QInt & first, const QInt & second);
 	friend QInt operator&(const QInt & index_1, const QInt & index_2);
 	friend QInt operator|(const QInt & index_1, const QInt & index_2);
 	friend QInt operator^(const QInt & index_1, const QInt & index_2);
@@ -41,25 +41,23 @@ public:
 	string convertToHex();
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
-	void print(int mode);
+	//Input - Output system
+	static void runCal(char* input, char* output);
+	static void Cal(istream & is, ostream & os);
+	void print(int mode, ostream & os);
 	//Suporting
 	string normalize();
+	//Comparison operators
+	friend bool operator==(const QInt & first, const QInt & second);
 };
 
 void PlusOne(string & result);
 void MultByTwo(string & result);
 string conHexBin(char c);
 
-int main()
+int main(int argc, char** argv)
 {
-
-	QInt a(10, "-3"), b(10, "6");
-	cout << "\n---" << endl;
-	a.print(2); cout << endl;
-	b.print(2); cout << endl;
-	cout << "\n-----\n";
-	(a - b).print(2); cout << endl;
-  
+	QInt::runCal(argv[1], argv[2]);
 	system("pause");
 	return 0;
 }
@@ -97,55 +95,7 @@ QInt::QInt(int mode, string str)
 			*this = *this + ONE;	// bù 2
 		}
 	}
-	//if (mode == 10)
-	//{
-	//	bool negative = (str[0] == '-') ? true : false;
 
-	//	// nếu âm
-	//	if (negative)
-	//	{
-	//		str = str.substr(1);	// cắt bỏ '-' trong str
-	//	}
-	//	str = strBigDecToBin(str);
-
-	//	string str_bits = QInt(2, "0").bit.to_string(); // chuỗi nhị phân rỗng
-
-	//	if (negative)
-	//	{
-	//		// chuỗi bù 1
-	//		int i = str_bits.length() - 1;
-	//		while (i >= 0)
-	//		{
-	//			int pos = i - (str_bits.length() - str.length());
-	//			if (pos < 0)
-	//			{
-	//				str_bits[i] = '1';
-	//			}
-	//			else
-	//				str_bits[i] = '1' - (str[pos] - '0');
-	//			i--;
-	//		}
-
-	//		i = str_bits.length() - 1;
-	//		// chuỗi bù 2
-	//		int carry = 1;
-
-	//		while (carry != 0)
-	//		{
-	//			int temp = 0;
-	//			temp = str_bits[i] - '0' + carry;
-	//			carry = (temp > 1) ? 1 : 0;
-	//			temp %= 2;
-	//			str_bits[i] = temp + '0';
-	//			i--;
-	//		}
-
-	//		bit = bitset<128>(str_bits);
-	//	}
-	//	else
-	//		bit = bitset<128>(str);
-
-	//}
 	if (mode == 16)
 	{
 		string hstr = strBigHexToBin(str);
@@ -166,53 +116,67 @@ QInt::~QInt()
 string QInt::convertToDec()
 {
 	string str_bit = bit.to_string();
-	string result = "0000000000000000000000000000000000000000\0";	// result hiển thị giá trị thập phân (16 byte ~ 40 kí tự) 
+	string result = "0000000000000000000000000000000000000000\0";	// result hiển thị giá trị thập phân (16 byte ~ 40 kí tự)
 
-	// đánh dấu bit 1 đầu tiên
-	int i = 0;
-	while (i < str_bit.length() && str_bit[i] == 48)
+																	// đánh dấu bit 1 đầu tiên
+	bool negative = (str_bit[0] == '1') ? true : false;
+	str_bit = this->normalize();
+
+
+	// nếu âm
+	if (negative)
 	{
-		i++;
+		QInt abs_bit = *this;
+		abs_bit = abs_bit - QInt(10, "1");	// abs_bit là bù 1
+		abs_bit.bit = ~(abs_bit.bit);		// abs_bit là thể hiện nhị phân của trị tuyệt đối decimal
+		str_bit = abs_bit.normalize();
 	}
 
-	// duyệt chuỗi nhị phân từ trái sang phải
+	int i = 0;
 	char add = str_bit[i] - '0';
 
-	while (i < 128)
+	while (i < str_bit.length())
 	{
 		MultByTwo(result);		// nhân 2
 		if (add == 1)
 			PlusOne(result);	// cộng bit tiếp theo
 
 		i++;
-		add = str_bit[i] - '0';
+		if (i < str_bit.length())
+			add = str_bit[i] - '0';
 	}
 
-	// loại bỏ các phần tử 0 đầu
-	while (result[0] == '0' && result.length() != 1)
-	{
-		result = result.substr(1);
+	// cắt bỏ các số 0 đầu
+	i = 0;
+	while (result[i] == '0') {
+		i++;
 	}
+	if (negative)
+		result = result.substr(i - 1), result[0] = '-';
+	else result = result.substr(i);
 
 	return result;
 }
 
 string QInt::convertToHex()
 {
-	string str_bits = bit.to_string();
 
-	// chuẩn hóa dãy bit (nhóm 4 bit)
-	int i = 0, pos = 0;
+	string str_bits = bit.to_string();
+	int i = 1;
+	int pos = i;
+
 	while (str_bits[i] == str_bits[i - 1])
 	{
 		if ((str_bits.length() - i - 1) % 4 == 0)
 			pos = i;
 		i++;
 	}
+	str_bits = str_bits.substr(pos + 1);
 
-	str_bits = str_bits.substr(pos + 1, str_bits.length() - pos);
 
-	string result = "00000000000000000000000000000000\n";
+	//string result = "00000000000000000000000000000000\n";
+	string result;
+
 	// xuất chuỗi thập lục phân
 	i = 0;
 	int temp = 0;
@@ -225,18 +189,18 @@ string QInt::convertToHex()
 		{
 			if (temp <= 9)
 			{
-				result[(i + 1) / 4 - 1] = temp + '0';
+				result += (temp + '0');
 			}
 			else
 			{
 				switch (temp)
 				{
-				case 10: result[(i + 1) / 4 - 1] = 'A'; break;
-				case 11: result[(i + 1) / 4 - 1] = 'B'; break;
-				case 12: result[(i + 1) / 4 - 1] = 'C'; break;
-				case 13: result[(i + 1) / 4 - 1] = 'D'; break;
-				case 14: result[(i + 1) / 4 - 1] = 'E'; break;
-				default: result[(i + 1) / 4 - 1] = 'F'; break;
+				case 10: result += 'A'; break;
+				case 11: result += 'B'; break;
+				case 12: result += 'C'; break;
+				case 13: result += 'D'; break;
+				case 14: result += 'E'; break;
+				default: result += 'F'; break;
 				}
 			}
 			temp = 0;
@@ -245,7 +209,7 @@ string QInt::convertToHex()
 		add = str_bits[i] - '0';
 	}
 
-	result = result.substr(0, str_bits.length() / 4);
+	//result = result.substr(0, str_bits.length() / 4);
 
 	return result;
 }
@@ -314,19 +278,124 @@ string QInt::strBigDecToBin(string str)
 string QInt::strBigHexToBin(string str)
 {
 	string result = "";
-	for (int i = 2; i < str.length(); i++)
+	for (int i = 0; i < str.length(); i++)
 	{
 		result = result + conHexBin(str[i]);
 	}
 	return string(result);
 }
 
-void QInt::print(int mode)
+
+void QInt::runCal(char* input, char* output)
 {
+	fstream is, os;
+	is.open(input, ios::in);
+	os.open(output, ios::out);
+	while (is.peek() != EOF)
+	{
+		QInt::Cal(is, os);
+		is.peek();
+		os << "\n";
+	}
+}
+
+void QInt::Cal(istream & is, ostream & os)
+{
+	vector<string> arr_elements;
+	QInt val1, val2;
+	QInt result;
+	int mode, mode_s;
+	string op;
+	while (is.peek() != '\n' && is.peek() != EOF)
+	{
+		string tmp;
+		is >> tmp;
+		arr_elements.push_back(tmp);
+	}
+	is.seekg(2, ios_base::cur);
+	op = arr_elements[arr_elements.capacity() - 2];
+	if (op == "+" || op == "-" || op == "*" || op == "/" || op == "&" || op == "|" || op == "^")
+	{
+		mode = stoi(arr_elements[0]);
+		val1 = QInt(mode, arr_elements[1]);
+		val2 = QInt(mode, arr_elements[3]);
+		switch (op[0])
+		{
+		case '+':
+			result = val1 + val2; break;
+		case '-':
+			result = val1 - val2; break;
+		case '*':
+			result = val1 * val2; break;
+		case '/':
+			result = val1 / val2; break;
+		case '&':
+			result = val1 & val2; break;
+		case '|':
+			result = val1 | val2; break;
+		case '^':
+			result = val1 ^ val2; break;
+		default:
+			os << "Err\n"; break;
+		}
+		result.print(mode, os);
+		return;
+	}
+	else if (op == ">>" || op == "<<")
+	{
+		mode = stoi(arr_elements[0]);
+		val1 = QInt(mode, arr_elements[1]);
+		int step = stoi(arr_elements[3]);
+		if (op == ">>")
+			result = val1 >> step;
+		else if (op == "<<")
+			result = val1 << step;
+		else
+			cout << "Err\n";
+		result.print(mode, os);
+		return;
+	}
+	else if (op == "~" || op == "rol" || op == "ror")
+	{
+		mode = stoi(arr_elements[0]);
+		val1 = QInt(mode, arr_elements[2]);
+		if (op == "~")
+			result = ~val1;
+		else if (op == "rol")
+			result = val1.rol();
+		else if (op == "ror")
+			result = val1.ror();
+		else
+			cout << "Err\n";
+		result.print(mode, os);
+		return;
+	}
+	else
+	{
+		mode = stoi(arr_elements[0]);
+		mode_s = stoi(arr_elements[1]);
+		val1 = QInt(mode, arr_elements[2]);
+		val1.print(mode_s, os);
+		return;
+	}
+}
+
+void QInt::print(int mode, ostream & os)
+{
+	if (*this == QInt(2, "0"))
+	{
+		os << '0';
+		return;
+	}
+
 	string result;
 	if (mode == 2)
 	{
 		result = this->bit.to_string();
+		while (result[0] == '0')
+		{
+			result = result.substr(1);
+		}
 	}
 	if (mode == 10)
 	{
@@ -334,10 +403,9 @@ void QInt::print(int mode)
 	}
 	if (mode == 16)
 	{
-		cout << "0x";	
 		result = this->convertToHex();
 	}
-	cout << result;
+	os << result;
 }
 
 string conHexBin(char c)
@@ -385,17 +453,11 @@ string conHexBin(char c)
 string QInt::normalize()
 {
 	string str_bits = bit.to_string();
-	int i = 0;
-	int pos = i;
 
-	while (str_bits[i] == str_bits[i - 1])
-	{
-		if ((str_bits.length() - i - 1) % 4 == 0)
-			pos = i;
-		i++;
-	}
+	int i = 1;
+	while (str_bits[i] == str_bits[i - 1]) i++;
 
-	return str_bits.substr(pos + 1);
+	return str_bits.substr(i);
 }
 
 void MultByTwo(string & result)
@@ -411,6 +473,18 @@ void MultByTwo(string & result)
 	}
 
 	result = copy;
+}
+
+bool operator==(const QInt & first, const QInt & second)
+{
+	int i = 0;
+	while (i <= MAXBITS)
+	{
+		if (first.bit.to_string()[i] != second.bit.to_string()[i])
+			return false;
+		i++;
+	}
+	return true;
 }
 
 void PlusOne(string & result)
@@ -460,51 +534,100 @@ QInt operator*(const QInt & first, const QInt & second)
 	string str2 = second.bit.to_string();
 	string result = QInt(10, "0").bit.to_string();
 
-	// làm gọn str1
-	int i = 1;
-	int pos = i;
-	while (str1[i] == str1[i - 1])
-	{
-		if ((str1.length() - i - 1) % 4 == 0)
-			pos = i;
-		i++;
-	}
-	str1 = str1.substr(pos + 1);
-
-	// làm gọn str2
-	i = 1, pos = 0;
-	while (str2[i] == str2[i - 1])
-	{
-		if ((str2.length() - i - 1) % 4 == 0)
-			pos = i;
-		i++;
-	}
-	str2 = str2.substr(pos + 1);
-
-	result = result.substr(0, str1.length() + str2.length());	// điều chỉnh độ dài result
-
 	// xây dựng chuỗi kết quả
-	char carry = '0';
-	for (int i = str1.length() - 1; i >= 0; i--)
+	int carry = 0;
+	for (int i = str1.length() - 1; i >= 0; i--, carry = 0)
 	{
 		for (int j = str2.length() - 1; j >= 0; j--)
 		{
-			result[i + j + 1] += (carry - '0');
-			result[i + j + 1] += (((str1[i] == '0') ? '0' : str2[j]) - '0');
-
-			if (result[i + j + 1] > '1')
+			int pos = j - (str1.length() - 1 - i);
+			if (pos >= 0)
 			{
-				carry = '1';
-				result[i + j + 1] = ((result[i + j + 1] - '0') % 2) + '0';
-			}
-			else carry = '0';
+				int temp = carry + (result[pos] - '0');
+				temp += (str1[i] == '0') ? 0 : str2[j] - '0';
 
-			if (i == 0 && j == 0)
-				result[i + j] += (carry - '0');
+				result[pos] = temp % 2 + '0';
+
+				if (temp > 1)
+				{
+					carry = 1;
+				}
+				else
+				{
+					carry = 0;
+				}
+				temp = 0;
+			}
 		}
 	}
 
+
 	return QInt(2, result);
+}
+
+QInt operator/(const QInt & first, const QInt & second)
+{
+	if (second == QInt(10, "0"))
+	{
+		cout << "Error: divided by ";
+		return second;
+	}
+
+	string str1 = first.bit.to_string();
+	string str2 = second.bit.to_string();
+	string result;
+
+	// xét first, second cùng hay khác dấu
+	bool neg = ((str1[0] != '0'&&str2[0] == '0') || (str1[0] == '0'&&str2[0] != '0')) ? true : false;
+
+	// chuẩn hóa, đưa về trị tuyệt đối
+	if (str1[0] == '1')
+	{
+		QInt abs_bit = first - QInt(10, "1");	// abs_bit là bù 1
+		abs_bit.bit = ~(abs_bit.bit);			// abs_bit là thể hiện nhị phân của trị tuyệt đối decimal
+		str1 = abs_bit.bit.to_string();
+	}
+	int i = 1;
+	while (str1[i] == str1[i - 1]) i++;
+	str1 = str1.substr(i);
+
+
+	if (str2[0] == '1')
+	{
+		QInt abs_bit = second - QInt(10, "1");	// abs_bit là bù 1
+		abs_bit.bit = ~(abs_bit.bit);			// abs_bit là thể hiện nhị phân của trị tuyệt đối decimal
+		str2 = abs_bit.bit.to_string();
+	}
+	i = 1;
+	while (str2[i] == str2[i - 1]) i++;
+	str2 = str2.substr(i);
+
+	// xây dựng chuỗi kết quả
+	i = str2.length();
+	string temp = str1.substr(0, i);
+	while (i <= str1.length())
+	{
+		char add = ((temp.length() > str2.length()) || (temp.length() == str2.length() && temp >= str2)) ? '1' : '0';
+		result += add;
+		if (add == '1')
+		{
+			QInt qtemp(2, temp);
+			QInt qstr2(2, str2);
+			temp = (qtemp - qstr2).normalize();
+		}
+
+		temp += str1[i];
+		i++;
+	}
+
+	// nếu số bị chia nhỏ hơn số chia
+	if (str1.length() < str2.length())
+		return QInt(10, "0");
+
+	if (!neg)
+		return QInt(2, result);
+	else
+		return ~QInt(2, result) + QInt(10, "1");	// bù 2
 }
 
 QInt operator&(const QInt & index_1, const QInt & index_2)
@@ -552,19 +675,26 @@ QInt operator<<(const QInt & index, int step)
 QInt QInt::rol()
 {
 	QInt result;
-	bool index;
-	index = this->bit[0];
-	result.bit = this->bit << 1;
+	result = *this << 1;
 	result.bit.set(0, 1);
-	return QInt(result); 
+	int i = MAXBITS;
+	while (result.bit[i] == 0) i--;
+	result.bit.set(i, 0);
+	return QInt(result);
 }
 
 QInt QInt::ror()
 {
 	QInt result;
 	bool index;
-	index = this->bit[MAXBITS];
-	result.bit = this->bit >> 1;
-	result.bit.set(MAXBITS, 1);
-	return QInt(result); 
+	index = this->bit[0];
+	result = *this >> 1;
+	if (index == 1)
+	{
+		int i = MAXBITS;
+		while (result.bit[i] == 0)
+			i--;
+		result.bit.set(i + 1, index);
+	}
+	return QInt(result);
 }
