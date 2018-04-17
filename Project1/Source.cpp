@@ -42,7 +42,8 @@ public:
 	static string strBigDecToBin(string str);
 	static string strBigHexToBin(string str);
 	//Input - Output system
-	static void input(istream & is);
+	static void runCal(char* input, char* output);
+	static void Cal(istream & is, ostream & os);
 	void print(int mode, ostream & os);
 	//Suporting
 	string normalize();
@@ -54,13 +55,9 @@ void PlusOne(string & result);
 void MultByTwo(string & result);
 string conHexBin(char c);
 
-int main()
+int main(int argc, char** argv)
 {
-	QInt a(10, "60"), b(10, "-120");
-	(a / b).print(10);
-
-	cout << endl;
-
+	QInt::runCal(argv[1], argv[2]);
 	system("pause");
 	return 0;
 }
@@ -281,7 +278,7 @@ string QInt::strBigDecToBin(string str)
 string QInt::strBigHexToBin(string str)
 {
 	string result = "";
-	for (int i = 2; i < str.length(); i++)
+	for (int i = 0; i < str.length(); i++)
 	{
 		result = result + conHexBin(str[i]);
 	}
@@ -289,25 +286,97 @@ string QInt::strBigHexToBin(string str)
 }
 
 
-void QInt::input(istream & is)
+void QInt::runCal(char* input, char* output)
+{
+	fstream is, os;
+	is.open(input, ios::in);
+	os.open(output, ios::out);
+	while (is.peek() != EOF)
+	{
+		QInt::Cal(is, os);
+		is.peek();
+		os << "\n";
+	}
+}
+
+void QInt::Cal(istream & is, ostream & os)
 {
 	vector<string> arr_elements;
 	QInt val1, val2;
+	QInt result;
 	int mode, mode_s;
 	string op;
-	while (is.peek() != '\n')
+	while (is.peek() != '\n' && is.peek() != EOF)
 	{
 		string tmp;
 		is >> tmp;
 		arr_elements.push_back(tmp);
 	}
-	cout << arr_elements.capacity();
+	is.seekg(2, ios_base::cur);
 	op = arr_elements[arr_elements.capacity() - 2];
 	if (op == "+" || op == "-" || op == "*" || op == "/" || op == "&" || op == "|" || op == "^")
 	{
 		mode = stoi(arr_elements[0]);
 		val1 = QInt(mode, arr_elements[1]);
 		val2 = QInt(mode, arr_elements[3]);
+		switch (op[0])
+		{
+		case '+':
+			result = val1 + val2; break;
+		case '-':
+			result = val1 - val2; break;
+		case '*':
+			result = val1 * val2; break;
+		case '/':
+			result = val1 / val2; break;
+		case '&':
+			result = val1 & val2; break;
+		case '|':
+			result = val1 | val2; break;
+		case '^':
+			result = val1 ^ val2; break;
+		default:
+			os << "Err\n"; break;
+		}
+		result.print(mode, os);
+		return;
+	}
+	else if (op == ">>" || op == "<<")
+	{
+		mode = stoi(arr_elements[0]);
+		val1 = QInt(mode, arr_elements[1]);
+		int step = stoi(arr_elements[3]);
+		if (op == ">>")
+			result = val1 >> step;
+		else if (op == "<<")
+			result = val1 << step;
+		else
+			cout << "Err\n";
+		result.print(mode, os);
+		return;
+	}
+	else if (op == "~" || op == "rol" || op == "ror")
+	{
+		mode = stoi(arr_elements[0]);
+		val1 = QInt(mode, arr_elements[2]);
+		if (op == "~")
+			result = ~val1;
+		else if (op == "rol")
+			result = val1.rol();
+		else if (op == "ror")
+			result = val1.ror();
+		else
+			cout << "Err\n";
+		result.print(mode, os);
+		return;
+	}
+	else
+	{
+		mode = stoi(arr_elements[0]);
+		mode_s = stoi(arr_elements[1]);
+		val1 = QInt(mode, arr_elements[2]);
+		val1.print(mode_s, os);
+		return;
 	}
 }
 
@@ -334,7 +403,6 @@ void QInt::print(int mode, ostream & os)
 	}
 	if (mode == 16)
 	{
-		cout << "0x";
 		result = this->convertToHex();
 	}
 	os << result;
@@ -607,10 +675,11 @@ QInt operator<<(const QInt & index, int step)
 QInt QInt::rol()
 {
 	QInt result;
-	bool index;
-	index = this->bit[0];
-	result.bit = this->bit << 1;
+	result = *this << 1;
 	result.bit.set(0, 1);
+	int i = MAXBITS;
+	while (result.bit[i] == 0) i--;
+	result.bit.set(i, 0);
 	return QInt(result);
 }
 
@@ -618,8 +687,14 @@ QInt QInt::ror()
 {
 	QInt result;
 	bool index;
-	index = this->bit[MAXBITS];
-	result.bit = this->bit >> 1;
-	result.bit.set(MAXBITS, 1);
+	index = this->bit[0];
+	result = *this >> 1;
+	if (index == 1)
+	{
+		int i = MAXBITS;
+		while (result.bit[i] == 0)
+			i--;
+		result.bit.set(i + 1, index);
+	}
 	return QInt(result);
 }
