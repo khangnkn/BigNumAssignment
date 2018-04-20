@@ -2,7 +2,7 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include <sstream>
+//#include <sstream>
 #include <fstream>
 #include <bitset>
 #include <fstream>
@@ -54,6 +54,7 @@ public:
 void PlusOne(string & result);
 void MultByTwo(string & result);
 string conHexBin(char c);
+string conBinHex(string bstr);
 
 int main(int argc, char** argv)
 {
@@ -160,61 +161,22 @@ string QInt::convertToDec()
 
 string QInt::convertToHex()
 {
-
-	string str_bits = bit.to_string();
-	int i = 1;
-	int pos = i;
-
-	while (str_bits[i] == str_bits[i - 1])
-	{
-		if ((str_bits.length() - i - 1) % 4 == 0)
-			pos = i;
-		i++;
-	}
-	str_bits = str_bits.substr(pos + 1);
-
-
-	//string result = "00000000000000000000000000000000\n";
+	string hex_str = bit.to_string();
 	string result;
-
-	// xuất chuỗi thập lục phân
-	i = 0;
-	int temp = 0;
-	int add = 0;
-	while (i < str_bits.length())
+	string tmp_str;
+	for (int i = 0; i < MAXBITS; i = i + 4)
 	{
-		temp = temp * 2 + add;
-
-		if ((i + 1) % 4 == 0)
-		{
-			if (temp <= 9)
-			{
-				result += (temp + '0');
-			}
-			else
-			{
-				switch (temp)
-				{
-				case 10: result += 'A'; break;
-				case 11: result += 'B'; break;
-				case 12: result += 'C'; break;
-				case 13: result += 'D'; break;
-				case 14: result += 'E'; break;
-				default: result += 'F'; break;
-				}
-			}
-			temp = 0;
-		}
-		i++;
-		add = str_bits[i] - '0';
+		tmp_str = hex_str.substr(i, 4);
+		result = result + conBinHex(tmp_str);
 	}
-
-	//result = result.substr(0, str_bits.length() / 4);
-
+	int i = 0;
+	while (hex_str[i] == '0')
+	{
+		hex_str = hex_str.substr(i);
+		i++;
+	}
 	return result;
 }
-
-
 //Private functions.
 //These functions support calculating process.
 bool carry(string str)
@@ -255,9 +217,9 @@ string QInt::strBigDecToBin(string str)
 	string bin = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 	if (str[0] != '-')
 	{
-		for (int i = 0; i < 128 && str != "0"; i++)
+		for (int i = 0; i <= MAXBITS && str != "0"; i++)
 		{
-			bin[127 - i] = carry(str) + 48;
+			bin[MAXBITS - i] = carry(str) + 48;
 			str = DivByTwo(str);
 		}
 	}
@@ -297,6 +259,8 @@ void QInt::runCal(char* input, char* output)
 		is.peek();
 		os << "\n";
 	}
+	is.close();
+	os.close();
 }
 
 void QInt::Cal(istream & is, ostream & os)
@@ -450,6 +414,51 @@ string conHexBin(char c)
 	}
 }
 
+string conBinHex(string bstr)
+{
+	bitset<4> bs(bstr);
+	string result;
+	int swt = bs.to_ullong();
+	switch (swt)
+	{
+	case 0:
+		result = result + "0"; break;
+	case 1:
+		result = result + "1"; break;
+	case 2:
+		result = result + "2"; break;
+	case 3:
+		result = result + "3"; break;
+	case 4:
+		result = result + "4"; break;
+	case 5:
+		result = result + "5"; break;
+	case 6:
+		result = result + "6"; break;
+	case 7:
+		result = result + "7"; break;
+	case 8:
+		result = result + "8"; break;
+	case 9:
+		result = result + "9"; break;
+	case 10:
+		result = result + "A"; break;
+	case 11:
+		result = result + "B"; break;
+	case 12:
+		result = result + "C"; break;
+	case 13:
+		result = result + "D"; break;
+	case 14:
+		result = result + "E"; break;
+	case 15:
+		result = result + "F"; break;
+	default:
+		break;
+	}
+	return result;
+}
+
 string QInt::normalize()
 {
 	string str_bits = bit.to_string();
@@ -569,7 +578,7 @@ QInt operator/(const QInt & first, const QInt & second)
 {
 	if (second == QInt(10, "0"))
 	{
-		cout << "Error: divided by ";
+		cout << "Error: divided by 0\n";
 		return second;
 	}
 
