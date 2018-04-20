@@ -169,11 +169,14 @@ string QInt::convertToHex()
 		tmp_str = hex_str.substr(i, 4);
 		result = result + conBinHex(tmp_str);
 	}
-	int i = 0;
-	while (hex_str[i] == '0')
+	if (result[0] != 'F')
 	{
-		hex_str = hex_str.substr(i);
-		i++;
+		int i = 1;
+		while (result[i] == result[i - 1])
+		{
+			i++;
+		}
+		return result.substr(i - 1);
 	}
 	return result;
 }
