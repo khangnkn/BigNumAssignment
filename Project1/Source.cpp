@@ -163,7 +163,6 @@ string QInt::convertToDec()
 	if (negative)
 		result = result.substr(i - 1), result[0] = '-';
 	else result = result.substr(i);
-	cout << result;
 	return result;
 }
 
