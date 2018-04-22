@@ -2,7 +2,6 @@
 #include <cmath>
 #include <string>
 #include <vector>
-#include <sstream>
 #include <fstream>
 #include <bitset>
 #include <fstream>
@@ -53,8 +52,11 @@ public:
 
 void PlusOne(string & result);
 void MultByTwo(string & result);
+bool carry(string str);
 string conHexBin(char c);
+string conBinHex(string bstr);
 
+//Hàm main
 int main(int argc, char** argv)
 {
 	QInt::runCal(argv[1], argv[2]);
@@ -62,15 +64,19 @@ int main(int argc, char** argv)
 	return 0;
 }
 
+//3 hàm khởi tạo
+//Khởi tạo mặc định
 QInt::QInt()
 {
 }
 
+//Khởi tạo sao chép
 QInt::QInt(const QInt & index)
 {
 	this->bit = index.bit;
 }
 
+//Khởi tạo từ 1 string
 QInt::QInt(int mode, string str)
 {
 
@@ -103,16 +109,19 @@ QInt::QInt(int mode, string str)
 	}
 }
 
+//Toán tử gán
 QInt QInt::operator=(QInt const & index)
 {
 	this->bit = index.bit;
 	return QInt(*this);
 }
 
+//Hàm hủy
 QInt::~QInt()
 {
 }
 
+//Chuyển QInt sang string thập phân
 string QInt::convertToDec()
 {
 	string str_bit = bit.to_string();
@@ -154,75 +163,36 @@ string QInt::convertToDec()
 	if (negative)
 		result = result.substr(i - 1), result[0] = '-';
 	else result = result.substr(i);
-
 	return result;
 }
 
+//Chuyển QInt sang string thập lục phân
 string QInt::convertToHex()
 {
-
-	string str_bits = bit.to_string();
-	int i = 1;
-	int pos = i;
-
-	while (str_bits[i] == str_bits[i - 1])
-	{
-		if ((str_bits.length() - i - 1) % 4 == 0)
-			pos = i;
-		i++;
-	}
-	str_bits = str_bits.substr(pos + 1);
-
-
-	//string result = "00000000000000000000000000000000\n";
+	string hex_str = bit.to_string();
 	string result;
-
-	// xuất chuỗi thập lục phân
-	i = 0;
-	int temp = 0;
-	int add = 0;
-	while (i < str_bits.length())
+	string tmp_str;
+	for (int i = 0; i < MAXBITS; i = i + 4)
 	{
-		temp = temp * 2 + add;
-
-		if ((i + 1) % 4 == 0)
-		{
-			if (temp <= 9)
-			{
-				result += (temp + '0');
-			}
-			else
-			{
-				switch (temp)
-				{
-				case 10: result += 'A'; break;
-				case 11: result += 'B'; break;
-				case 12: result += 'C'; break;
-				case 13: result += 'D'; break;
-				case 14: result += 'E'; break;
-				default: result += 'F'; break;
-				}
-			}
-			temp = 0;
-		}
-		i++;
-		add = str_bits[i] - '0';
+		tmp_str = hex_str.substr(i, 4);
+		result = result + conBinHex(tmp_str);
 	}
-
-	//result = result.substr(0, str_bits.length() / 4);
-
+	int i = 0;
+	while (hex_str[i] == '0')
+	{
+		hex_str = hex_str.substr(i);
+		i++;
+	}
 	return result;
 }
 
-
-//Private functions.
-//These functions support calculating process.
 bool carry(string str)
 {
 	int n = str.length();
 	return (str[n - 1] - 48) % 2;
 }
 
+//Nhân 2
 string DivByTwo(string str)
 {
 	string result = str;
@@ -249,15 +219,16 @@ string DivByTwo(string str)
 	return result;
 }
 
+//Convert string thập phân sang string nhị phân
 string QInt::strBigDecToBin(string str)
 {
 	// ASK: nếu str < 0 thì sao?
 	string bin = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
 	if (str[0] != '-')
 	{
-		for (int i = 0; i < 128 && str != "0"; i++)
+		for (int i = 0; i <= MAXBITS && str != "0"; i++)
 		{
-			bin[127 - i] = carry(str) + 48;
+			bin[MAXBITS - i] = carry(str) + 48;
 			str = DivByTwo(str);
 		}
 	}
@@ -275,6 +246,7 @@ string QInt::strBigDecToBin(string str)
 	return bin;
 }
 
+//Convert string thập lục phân sang string nhị phân
 string QInt::strBigHexToBin(string str)
 {
 	string result = "";
@@ -285,7 +257,7 @@ string QInt::strBigHexToBin(string str)
 	return string(result);
 }
 
-
+//Hàm chạy toàn bộ chương trình với hai tham số là hai tên file
 void QInt::runCal(char* input, char* output)
 {
 	fstream is, os;
@@ -297,8 +269,11 @@ void QInt::runCal(char* input, char* output)
 		is.peek();
 		os << "\n";
 	}
+	is.close();
+	os.close();
 }
 
+//Hàm tính toán và trả về kết quả của mỗi dòng trong file txt
 void QInt::Cal(istream & is, ostream & os)
 {
 	vector<string> arr_elements;
@@ -380,6 +355,7 @@ void QInt::Cal(istream & is, ostream & os)
 	}
 }
 
+//Xuất kết quả
 void QInt::print(int mode, ostream & os)
 {
 	if (*this == QInt(2, "0"))
@@ -408,6 +384,7 @@ void QInt::print(int mode, ostream & os)
 	os << result;
 }
 
+//Hai hàm bên dưới chuyển đổi từng kí tự hexa ra nhị phân
 string conHexBin(char c)
 {
 	int swh = c - 48;
@@ -450,6 +427,52 @@ string conHexBin(char c)
 	}
 }
 
+string conBinHex(string bstr)
+{
+	bitset<4> bs(bstr);
+	string result;
+	int swt = bs.to_ullong();
+	switch (swt)
+	{
+	case 0:
+		result = result + "0"; break;
+	case 1:
+		result = result + "1"; break;
+	case 2:
+		result = result + "2"; break;
+	case 3:
+		result = result + "3"; break;
+	case 4:
+		result = result + "4"; break;
+	case 5:
+		result = result + "5"; break;
+	case 6:
+		result = result + "6"; break;
+	case 7:
+		result = result + "7"; break;
+	case 8:
+		result = result + "8"; break;
+	case 9:
+		result = result + "9"; break;
+	case 10:
+		result = result + "A"; break;
+	case 11:
+		result = result + "B"; break;
+	case 12:
+		result = result + "C"; break;
+	case 13:
+		result = result + "D"; break;
+	case 14:
+		result = result + "E"; break;
+	case 15:
+		result = result + "F"; break;
+	default:
+		break;
+	}
+	return result;
+}
+
+//Định dạng string: cắt bỏ những phần tử đầu trùng lặp
 string QInt::normalize()
 {
 	string str_bits = bit.to_string();
@@ -460,6 +483,7 @@ string QInt::normalize()
 	return str_bits.substr(i);
 }
 
+//Nhân 2
 void MultByTwo(string & result)
 {
 	string copy = result;
@@ -475,6 +499,7 @@ void MultByTwo(string & result)
 	result = copy;
 }
 
+//Toán tử so sánh bằng
 bool operator==(const QInt & first, const QInt & second)
 {
 	int i = 0;
@@ -487,6 +512,7 @@ bool operator==(const QInt & first, const QInt & second)
 	return true;
 }
 
+//Cộng 1 vào string nhị phân (Dùng cho số bù)
 void PlusOne(string & result)
 {
 	int i = result.length() - 1;
@@ -500,6 +526,7 @@ void PlusOne(string & result)
 	}
 }
 
+//Các toán tử +, -, *, /, &, |, ^, ~, >>, <<, rol, ror
 QInt operator+(const QInt & first, const QInt & second)
 {
 	string str1 = first.bit.to_string();
@@ -569,7 +596,7 @@ QInt operator/(const QInt & first, const QInt & second)
 {
 	if (second == QInt(10, "0"))
 	{
-		cout << "Error: divided by ";
+		cout << "Error: divided by 0\n";
 		return second;
 	}
 
