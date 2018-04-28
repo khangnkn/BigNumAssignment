@@ -1,9 +1,9 @@
 # BigNumAssignment
-Authors:
-  NGUYEN KHAC NGUYEN KHANG  https://github.com/nkhang
-  NGUYEN THI NGAN KHANH     https://github.com/ngankhanh98
-  TA NGOC DUY KHOA          https://github.com/tndkhoa0903
-Email: nguyenkhacnguyenkhang@gmail.com
+##Authors:
+- NGUYEN KHAC NGUYEN KHANG  https://github.com/nkhang
+- NGUYEN THI NGAN KHANH     https://github.com/ngankhanh98
+- TA NGOC DUY KHOA          https://github.com/tndkhoa0903
+###Email: nguyenkhacnguyenkhang@gmail.com
 
 Release: Project1.exe works only on Windows 64-bit machines.
 Project provides:
