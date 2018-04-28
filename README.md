@@ -3,6 +3,7 @@
 - NGUYEN KHAC NGUYEN KHANG  https://github.com/nkhang
 - NGUYEN THI NGAN KHANH     https://github.com/ngankhanh98
 - TA NGOC DUY KHOA          https://github.com/tndkhoa0903
+
 Email: nguyenkhacnguyenkhang@gmail.com
 
 Release: Project1.exe works only on Windows 64-bit machines.
@@ -13,7 +14,7 @@ Project provides:
 4. rol, ror
 5. convert big integer among binary, hexa, decimal types
 6. bug fixed
-Instruction:
+## Instruction:
   1. Create an input file. E.g Input.txt
   2. Create an output file. E.g Output.txt
   3. Write Input.txt.
